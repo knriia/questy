@@ -1,0 +1,21 @@
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["backend/app/infrastructure/postgres/migrations/versions/*"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "I", "B", "C4", "UP", "ASYNC",
+    "ANN", "S", "PTH", "SIM", "TCH", "RUF",
+    "FAST", "PYI"
+]
+
+ignore = ["D", "ANN401", "B008", "S101", "RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.flake8-annotations]
+ignore-fully-untyped = false
+suppress-none-returning = true
+suppress-dummy-args = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "backend"]
