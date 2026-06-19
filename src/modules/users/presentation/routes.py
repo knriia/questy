@@ -1,9 +1,9 @@
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter
 
-from src.modules.users.dto import UserCreateDTO, UserReadDTO
-from src.modules.users.entities import UserEntity
-from src.modules.users.service import UserService
+from src.modules.users.application.service import UserService
+from src.modules.users.domain.entities import UserEntity
+from src.modules.users.presentation.dto import UserCreateDTO, UserReadDTO
 
 user_router = APIRouter(prefix="/users", tags=["users"])
 

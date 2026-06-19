@@ -1,5 +1,5 @@
-from src.modules.users.entities import SavedUserEntity, UserEntity
-from src.modules.users.repository import UserRepository
+from src.modules.users.domain.entities import SavedUserEntity, UserEntity
+from src.modules.users.infrastructure.repository import UserRepository
 
 
 class UserService:

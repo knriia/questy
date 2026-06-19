@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from di.container import container
 from src.core.logger import logger
-from src.modules.users.api import user_router
+from src.modules.users.presentation.routes import user_router
 
 
 @asynccontextmanager
