@@ -1,6 +1,7 @@
-from dishka import Provider, Scope, provide
 from collections.abc import AsyncIterable
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine, create_async_engine, async_sessionmaker
+
+from dishka import Provider, Scope, provide
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 from src.core.config import Settings
 

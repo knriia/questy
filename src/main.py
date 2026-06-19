@@ -1,7 +1,7 @@
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from dishka.integrations.fastapi import setup_dishka, FromDishka, inject
+from dishka.integrations.fastapi import FromDishka, inject, setup_dishka
+from fastapi import FastAPI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,13 +22,12 @@ setup_dishka(container=container, app=app)
 
 
 @app.get("/health")
-async def health():
+async def health() -> dict[str, str]:
     return {"message": "Hello World"}
 
 
 @app.get("/health/db")
 @inject
-async def health_db(session: FromDishka[AsyncSession]):
+async def health_db(session: FromDishka[AsyncSession]) -> dict[str, int | None]:
     result = await session.execute(text("SELECT 1"))
     return {"db": result.scalar()}
-
