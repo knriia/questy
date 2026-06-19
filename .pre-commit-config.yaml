@@ -1,4 +1,4 @@
-exclude: '^backend/app/infrastructure/postgres/migrations/versions/'
+exclude: '^migrations/versions/'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
