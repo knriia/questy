@@ -1,22 +1,45 @@
-.PHONY: up down logs restart shell ps
+.PHONY: help up down logs restart shell ps build rebuild down-v ps-a migrate create_migration
 
-SERVICE := $(word 2,$(MAKECMDGOALS))
-ifneq ($(SERVICE),)
-$(SERVICE):
+ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+SERVICE := $(firstword $(ARGS))
+
+ifneq ($(ARGS),)
+$(ARGS):
 	@:
 endif
 
-%:
-	@:
+help:
+	@echo "Available commands:"
+	@echo ""
+	@echo "  make up [services...]              Start containers"
+	@echo "  make build [services...]           Build containers"
+	@echo "  make rebuild [services...]         Rebuild containers without cache"
+	@echo "  make down                          Stop and remove containers"
+	@echo "  make down-v                        Stop and remove containers with volumes"
+	@echo "  make logs [services...]            Show logs"
+	@echo "  make restart [services...]         Restart containers"
+	@echo "  make shell <service>               Open shell in service"
+	@echo "  make ps                            Show running containers"
+	@echo "  make ps-a                          Show all containers"
+	@echo "  make migrate                       Apply migrations"
+	@echo "  make create_migration <name>       Create new alembic migration"
+	@echo ""
+	@echo "Examples:"
+	@echo "  make up"
+	@echo "  make up app postgres"
+	@echo "  make logs app"
+	@echo "  make shell app"
+	@echo "  make create_migration init_db"
+	@echo "  make migrate"
 
 up:
-	docker compose up -d $(SERVICE)
+	docker compose up -d $(ARGS)
 
 build:
-	docker compose build $(SERVICE)
+	docker compose build $(ARGS)
 
 rebuild:
-	docker compose build --no-cache $(SERVICE)
+	docker compose build --no-cache $(ARGS)
 
 down:
 	docker compose down
@@ -25,10 +48,10 @@ down-v:
 	docker compose down -v
 
 logs:
-	docker compose logs -f $(SERVICE)
+	docker compose logs -f $(ARGS)
 
 restart:
-	docker compose restart $(SERVICE)
+	docker compose restart $(ARGS)
 
 shell:
 	@if [ -z "$(SERVICE)" ]; then \
@@ -42,3 +65,13 @@ ps:
 
 ps-a:
 	docker compose ps -a
+
+migrate:
+	docker compose run --rm migrations
+
+create_migration:
+	@if [ -z "$(ARGS)" ]; then \
+		echo "Ошибка: укажи название миграции. Пример: make create_migration init_db"; \
+		exit 1; \
+	fi
+	docker compose run --rm app alembic revision --autogenerate -m "$(ARGS)"

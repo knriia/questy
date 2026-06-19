@@ -1,10 +1,26 @@
 services:
-  app:
-    container_name: app
+  migrations:
+    container_name: migrations
+    build: .
+    command: alembic upgrade head
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
+    volumes:
+      - ./migrations:/app/migrations
+      - ./alembic.ini:/app/alembic.ini
+    restart: "no"
+
+  app:
+    container_name: app
+    depends_on:
+      migrations:
+        condition: service_healthy
     build: .
+    env_file:
+      - .env
     ports:
       - "${APP_PORT}:8000"
     volumes:
@@ -20,6 +36,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
