@@ -5,8 +5,9 @@ from fastapi import FastAPI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.di.container import container
+from di.container import container
 from src.core.logger import logger
+from src.modules.users.api import user_router
 
 
 @asynccontextmanager
@@ -18,6 +19,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(user_router)
+
 setup_dishka(container=container, app=app)
 
 
