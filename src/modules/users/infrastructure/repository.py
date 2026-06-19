@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.modules.users.entities import SavedUserEntity, UserEntity
-from src.modules.users.models import User
+from src.modules.users.domain.entities import SavedUserEntity, UserEntity
+from src.modules.users.infrastructure.models import User
 
 
 class UserRepository:
