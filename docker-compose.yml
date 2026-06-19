@@ -7,6 +7,9 @@ services:
     build: .
     ports:
       - "${APP_PORT}:8000"
+    volumes:
+      - ./migrations:/app/migrations
+      - ./alembic.ini:/app/alembic.ini
     restart: unless-stopped
 
   postgres:
