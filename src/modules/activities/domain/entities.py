@@ -15,6 +15,7 @@ class ActivityEntity:
     description: str | None
     activity_type: ActivityType
     status: ActivityStatus
+    fields_schema: dict
 
     @classmethod
     def create(
@@ -22,6 +23,7 @@ class ActivityEntity:
         user_id: UUID,
         title: str,
         activity_type: ActivityType,
+        fields_schema: dict,
         description: str | None = None,
     ) -> "ActivityEntity":
         return cls(
@@ -31,6 +33,7 @@ class ActivityEntity:
             activity_type=activity_type,
             description=description,
             status=ActivityStatus.ACTIVE,
+            fields_schema=fields_schema,
         )
 
 

@@ -11,6 +11,7 @@ class ActivityCreateDTO(BaseModel):
     title: str
     description: str | None = None
     activity_type: ActivityType
+    fields_schema: dict
 
 
 class ActivityReadDTO(BaseModel):
@@ -20,5 +21,6 @@ class ActivityReadDTO(BaseModel):
     description: str | None = None
     activity_type: ActivityType
     status: ActivityStatus
+    fields_schema: dict
     created_at: datetime
     updated_at: datetime
