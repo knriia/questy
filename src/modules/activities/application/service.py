@@ -1,4 +1,4 @@
-from src.modules.activities.domain.entity import ActivityEntity, SavedActivityEntity
+from src.modules.activities.domain.entities import ActivityEntity, SavedActivityEntity
 from src.modules.activities.infrastructure.repository import ActivityRepository
 
 

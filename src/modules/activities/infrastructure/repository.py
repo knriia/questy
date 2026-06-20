@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.modules.activities.domain.entity import ActivityEntity, SavedActivityEntity
+from src.modules.activities.domain.entities import ActivityEntity, SavedActivityEntity
 from src.modules.activities.enums import ActivityStatus, ActivityType
 from src.modules.activities.infrastructure.models import ActivityModel
 
