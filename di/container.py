@@ -1,7 +1,7 @@
 from dishka import make_async_container
 
-from di.config import SettingsProvider
-from di.db import DbProvider
+from src.core.db.di import DbProvider
+from src.core.di import SettingsProvider
 from src.modules.activities.di import ActivityProvider
 from src.modules.users.di import UserProvider
 
