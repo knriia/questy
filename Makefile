@@ -1,4 +1,4 @@
-.PHONY: help up down logs restart shell ps build rebuild down-v ps-a migrate create_migration
+.PHONY: help up down logs restart shell ps build rebuild down-v ps-a migrate create_migration downgrade rollback_to
 
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 SERVICE := $(firstword $(ARGS))
@@ -22,6 +22,8 @@ help:
 	@echo "  make ps                            Show running containers"
 	@echo "  make ps-a                          Show all containers"
 	@echo "  make migrate                       Apply migrations"
+	@echo "  make downgrade                     Rollback last migration (-1)"
+	@echo "  make rollback_to <revision_id>     Rollback to specific revision ID"
 	@echo "  make create_migration <name>       Create new alembic migration"
 	@echo ""
 	@echo "Examples:"
@@ -31,6 +33,8 @@ help:
 	@echo "  make shell app"
 	@echo "  make create_migration init_db"
 	@echo "  make migrate"
+	@echo "  make downgrade"
+	@echo "  make rollback_to 5cef681a714a"
 
 up:
 	docker compose up -d $(ARGS)
@@ -74,4 +78,14 @@ create_migration:
 		echo "Ошибка: укажи название миграции. Пример: make create_migration init_db"; \
 		exit 1; \
 	fi
-	docker compose run --rm app alembic revision --autogenerate -m "$(ARGS)"
+	docker compose run --rm migrations alembic revision --autogenerate -m "$(ARGS)"
+
+downgrade:
+	docker compose run --rm migrations alembic downgrade -1
+
+rollback_to:
+	@if [ -z "$(ARGS)" ]; then \
+		echo "Ошибка: укажи ID миграции. Пример: make rollback_to 5cef681a714a"; \
+		exit 1; \
+	fi
+	docker compose run --rm migrations alembic downgrade $(ARGS)
