@@ -8,9 +8,10 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from src.core.config import Settings
 from src.core.db.base import Base
-from src.modules.activities.infrastructure.models import ActivityModel
+from src.modules.activities.infrastructure.models.activity import ActivityModel
+from src.modules.activities.infrastructure.models.schedule import ScheduleModel
 from src.modules.activity_records.infrastructure.models import ActivityRecordModel
-from src.modules.users.infrastructure.models import User
+from src.modules.users.infrastructure.models import UserModel
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

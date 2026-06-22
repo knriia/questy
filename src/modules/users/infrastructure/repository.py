@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.modules.users.domain.entities import SavedUserEntity, UserEntity
-from src.modules.users.infrastructure.models import User
+from src.modules.users.infrastructure.models import UserModel
 
 
 class UserRepository:
@@ -9,7 +9,7 @@ class UserRepository:
         self.session = session
 
     async def save_user(self, user: UserEntity) -> SavedUserEntity:
-        model = User(
+        model = UserModel(
             id=user.id,
             username=user.username,
             nickname=user.nickname,

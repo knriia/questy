@@ -13,3 +13,9 @@ class ActivityType(StrEnum):
 class ActivityStatus(StrEnum):
     ACTIVE = "active"
     ARCHIVED = "archived"
+
+
+class ScheduleType(StrEnum):
+    INTERVAL = "interval"
+    DAILY = "daily"
+    WEEKLY = "weekly"
