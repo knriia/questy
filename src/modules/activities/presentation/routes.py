@@ -16,6 +16,7 @@ async def create_activity(activity_dto: ActivityCreateDTO, service: FromDishka[A
         title=activity_dto.title,
         description=activity_dto.description,
         activity_type=activity_dto.activity_type,
+        fields_schema=activity_dto.fields_schema,
     )
     created_activity = await service.create_activity(activity=entity)
     return ActivityReadDTO(
@@ -25,6 +26,7 @@ async def create_activity(activity_dto: ActivityCreateDTO, service: FromDishka[A
         description=created_activity.description,
         activity_type=created_activity.activity_type,
         status=created_activity.status,
+        fields_schema=created_activity.fields_schema,
         created_at=created_activity.created_at,
         updated_at=created_activity.updated_at,
     )
