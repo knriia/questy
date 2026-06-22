@@ -17,6 +17,7 @@ class ActivityRepository:
             description=activity.description,
             activity_type=activity.activity_type,
             status=activity.status,
+            fields_schema=activity.fields_schema,
         )
         self.session.add(model)
         await self.session.commit()
@@ -30,4 +31,5 @@ class ActivityRepository:
             status=ActivityStatus(model.status),
             created_at=model.created_at,
             updated_at=model.updated_at,
+            fields_schema=model.fields_schema,
         )
