@@ -2,9 +2,9 @@ from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.modules.activities.application.services.activity import ActivityService
-from src.modules.activities.application.services.schedule import ScheduleService
+from src.modules.activities.application.services.activity_schedule import ActivityScheduleService
 from src.modules.activities.infrastructure.repositories.activity import ActivityRepository
-from src.modules.activities.infrastructure.repositories.schedule import ScheduleRepository
+from src.modules.activities.infrastructure.repositories.activity_schedule import ActivityScheduleRepository
 
 
 class ActivityProvider(Provider):
@@ -17,11 +17,11 @@ class ActivityProvider(Provider):
         return ActivityService(repository=repository)
 
 
-class ScheduleProvider(Provider):
+class ActivityScheduleProvider(Provider):
     @provide(scope=Scope.REQUEST)
-    async def schedule_repository(self, session: AsyncSession) -> ScheduleRepository:
-        return ScheduleRepository(session)
+    async def activity_schedule_repository(self, session: AsyncSession) -> ActivityScheduleRepository:
+        return ActivityScheduleRepository(session)
 
     @provide(scope=Scope.REQUEST)
-    async def schedule_service(self, repository: ScheduleRepository) -> ScheduleService:
-        return ScheduleService(repository=repository)
+    async def activity_schedule_service(self, repository: ActivityScheduleRepository) -> ActivityScheduleService:
+        return ActivityScheduleService(repository=repository)

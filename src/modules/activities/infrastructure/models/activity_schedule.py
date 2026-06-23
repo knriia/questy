@@ -7,8 +7,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.core.db.base import Base
 
 
-class ScheduleModel(Base):
-    __tablename__ = "schedules"
+class ActivityScheduleModel(Base):
+    __tablename__ = "activity_schedules"
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
     activity_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("activities.id"))
     schedule_type: Mapped[str] = mapped_column(String(55), nullable=False)

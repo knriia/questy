@@ -15,7 +15,7 @@ class ActivityStatus(StrEnum):
     ARCHIVED = "archived"
 
 
-class ScheduleType(StrEnum):
+class ActivityScheduleType(StrEnum):
     INTERVAL = "interval"
     DAILY = "daily"
     WEEKLY = "weekly"

@@ -3,22 +3,22 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from src.modules.activities.enums import ScheduleType
+from src.modules.activities.enums import ActivityScheduleType
 
 
-class ScheduleCreateDTO(BaseModel):
+class ActivityScheduleCreateDTO(BaseModel):
     activity_id: uuid.UUID
-    schedule_type: ScheduleType
+    schedule_type: ActivityScheduleType
     interval_minutes: int | None = None
     next_run_at: datetime
     timezone: str
     is_enabled: bool = True
 
 
-class ScheduleReadDTO(BaseModel):
+class ActivityScheduleReadDTO(BaseModel):
     id: uuid.UUID
     activity_id: uuid.UUID
-    schedule_type: ScheduleType
+    schedule_type: ActivityScheduleType
     interval_minutes: int | None
     next_run_at: datetime
     last_run_at: datetime | None

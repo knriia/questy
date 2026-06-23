@@ -4,14 +4,14 @@ from uuid import UUID
 
 from uuid6 import uuid6
 
-from src.modules.activities.enums import ScheduleType
+from src.modules.activities.enums import ActivityScheduleType
 
 
 @dataclass(kw_only=True)
-class ScheduleEntity:
+class ActivityScheduleEntity:
     id: UUID
     activity_id: UUID
-    schedule_type: ScheduleType
+    schedule_type: ActivityScheduleType
     interval_minutes: int | None
     next_run_at: datetime
     timezone: str
@@ -22,13 +22,13 @@ class ScheduleEntity:
     def create(
         cls,
         activity_id: UUID,
-        schedule_type: ScheduleType,
+        schedule_type: ActivityScheduleType,
         interval_minutes: int | None,
         next_run_at: datetime,
         timezone: str,
         is_enabled: bool,
         last_run_at: datetime | None = None,
-    ) -> "ScheduleEntity":
+    ) -> "ActivityScheduleEntity":
         return cls(
             id=uuid6(),
             activity_id=activity_id,
@@ -42,6 +42,6 @@ class ScheduleEntity:
 
 
 @dataclass
-class SavedScheduleEntity(ScheduleEntity):
+class SavedActivityScheduleEntity(ActivityScheduleEntity):
     created_at: datetime
     updated_at: datetime
