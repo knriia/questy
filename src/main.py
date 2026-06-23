@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from di.container import container
 from src.core.logger import logger
-from src.modules.activities.presentation.routes import activity_router
+from src.modules.activities.presentation.routes.activity import activity_router
+from src.modules.activities.presentation.routes.schedule import schedule_router
 from src.modules.activity_records.presentation.routes import activity_record_router
 from src.modules.users.presentation.routes import user_router
 
@@ -24,6 +25,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(user_router)
 app.include_router(activity_router)
 app.include_router(activity_record_router)
+app.include_router(schedule_router)
 
 setup_dishka(container=container, app=app)
 

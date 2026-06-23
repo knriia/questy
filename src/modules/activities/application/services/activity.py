@@ -1,5 +1,5 @@
 from src.modules.activities.domain.entities.activity import ActivityEntity, SavedActivityEntity
-from src.modules.activities.infrastructure.repository import ActivityRepository
+from src.modules.activities.infrastructure.repositories.activity import ActivityRepository
 
 
 class ActivityService:
