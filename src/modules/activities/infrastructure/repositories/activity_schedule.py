@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
@@ -35,3 +38,26 @@ class ActivityScheduleRepository:
             created_at=model.created_at,
             updated_at=model.updated_at,
         )
+
+    async def get_due_activity_schedules(self, now: datetime) -> list[SavedActivityScheduleEntity]:
+        result = await self.session.execute(
+            select(ActivityScheduleModel).where(
+                ActivityScheduleModel.is_enabled.is_(True), ActivityScheduleModel.next_run_at <= now
+            )
+        )
+        models = result.scalars().all()
+        return [
+            SavedActivityScheduleEntity(
+                id=model.id,
+                activity_id=model.activity_id,
+                schedule_type=ActivityScheduleType(model.schedule_type),
+                interval_minutes=model.interval_minutes,
+                next_run_at=model.next_run_at,
+                last_run_at=model.last_run_at,
+                timezone=model.timezone,
+                is_enabled=model.is_enabled,
+                created_at=model.created_at,
+                updated_at=model.updated_at,
+            )
+            for model in models
+        ]
