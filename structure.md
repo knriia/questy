@@ -28,6 +28,10 @@ questy/
 │   │   │   │   │   └── activity_schedule.py
 │   │   │   │   └── __init__.py
 │   │   │   ├── infrastructure/
+│   │   │   │   ├── mappers/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── activity.py
+│   │   │   │   │   └── activity_schedule.py
 │   │   │   │   ├── models/
 │   │   │   │   │   ├── __init__.py
 │   │   │   │   │   ├── activity.py
@@ -39,6 +43,10 @@ questy/
 │   │   │   │   └── __init__.py
 │   │   │   ├── presentation/
 │   │   │   │   ├── dto/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── activity.py
+│   │   │   │   │   └── activity_schedule.py
+│   │   │   │   ├── mappers/
 │   │   │   │   │   ├── __init__.py
 │   │   │   │   │   ├── activity.py
 │   │   │   │   │   └── activity_schedule.py
@@ -56,10 +64,12 @@ questy/
 │   │   │   ├── domain/
 │   │   │   │   └── entities.py
 │   │   │   ├── infrastructure/
+│   │   │   │   ├── mappers.py
 │   │   │   │   ├── models.py
 │   │   │   │   └── repository.py
 │   │   │   ├── presentation/
 │   │   │   │   ├── dto.py
+│   │   │   │   ├── mappers.py
 │   │   │   │   └── routes.py
 │   │   │   ├── di.py
 │   │   │   └── enums.py
@@ -70,10 +80,12 @@ questy/
 │   │   │   ├── domain/
 │   │   │   │   └── entities.py
 │   │   │   ├── infrastructure/
+│   │   │   │   ├── mappers.py
 │   │   │   │   ├── models.py
 │   │   │   │   └── repository.py
 │   │   │   ├── presentation/
 │   │   │   │   ├── dto.py
+│   │   │   │   ├── mappers.py
 │   │   │   │   └── routes.py
 │   │   │   └── di.py
 │   │   └── __init__.py
@@ -87,5 +99,4 @@ questy/
 ├── Makefile
 ├── pyproject.toml
 ├── README.md
-├── requirements.txt
-└── structure.md
+└── requirements.txt
