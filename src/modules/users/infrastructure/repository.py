@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.modules.users.domain.entities import SavedUserEntity, UserEntity
-from src.modules.users.infrastructure.models import UserModel
+from src.modules.users.infrastructure.mappers import user_entity_to_model, user_model_to_entity
 
 
 class UserRepository:
@@ -9,23 +9,9 @@ class UserRepository:
         self.session = session
 
     async def save_user(self, user: UserEntity) -> SavedUserEntity:
-        model = UserModel(
-            id=user.id,
-            username=user.username,
-            nickname=user.nickname,
-            email=user.email,
-            telegram_id=user.telegram_id,
-        )
+        model = user_entity_to_model(user_entity=user)
 
         self.session.add(model)
         await self.session.commit()
         await self.session.refresh(model)
-        return SavedUserEntity(
-            id=model.id,
-            username=model.username,
-            nickname=model.nickname,
-            email=model.email,
-            telegram_id=model.telegram_id,
-            created_at=model.created_at,
-            updated_at=model.updated_at,
-        )
+        return user_model_to_entity(user_model=model)

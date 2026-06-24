@@ -2,8 +2,8 @@ from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter
 
 from src.modules.activities.application.services.activity import ActivityService
-from src.modules.activities.domain.entities.activity import ActivityEntity
 from src.modules.activities.presentation.dto.activity import ActivityCreateDTO, ActivityReadDTO
+from src.modules.activities.presentation.mappers.activity import activity_dto_to_entity, activity_entity_to_dto
 
 activity_router = APIRouter(prefix="/activities", tags=["activities"])
 
@@ -11,22 +11,5 @@ activity_router = APIRouter(prefix="/activities", tags=["activities"])
 @activity_router.post("")
 @inject
 async def create_activity(activity_dto: ActivityCreateDTO, service: FromDishka[ActivityService]) -> ActivityReadDTO:
-    entity = ActivityEntity.create(
-        user_id=activity_dto.user_id,
-        title=activity_dto.title,
-        description=activity_dto.description,
-        activity_type=activity_dto.activity_type,
-        fields_schema=activity_dto.fields_schema,
-    )
-    created_activity = await service.create_activity(activity=entity)
-    return ActivityReadDTO(
-        id=created_activity.id,
-        user_id=created_activity.user_id,
-        title=created_activity.title,
-        description=created_activity.description,
-        activity_type=created_activity.activity_type,
-        status=created_activity.status,
-        fields_schema=created_activity.fields_schema,
-        created_at=created_activity.created_at,
-        updated_at=created_activity.updated_at,
-    )
+    entity = activity_dto_to_entity(activity_dto=activity_dto)
+    return activity_entity_to_dto(activity_entity=await service.create_activity(activity=entity))

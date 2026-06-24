@@ -4,7 +4,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
-from src.modules.activities.enums import ActivityScheduleType
+from src.modules.activities.infrastructure.mappers.activity_schedule import (
+    activity_schedule_entity_to_model,
+    activity_schedule_model_to_entity,
+)
 from src.modules.activities.infrastructure.models.activity_schedule import ActivityScheduleModel
 
 
@@ -13,31 +16,11 @@ class ActivityScheduleRepository:
         self.session = session
 
     async def save_activity_schedule(self, activity_schedule: ActivityScheduleEntity) -> SavedActivityScheduleEntity:
-        model = ActivityScheduleModel(
-            id=activity_schedule.id,
-            activity_id=activity_schedule.activity_id,
-            schedule_type=activity_schedule.schedule_type,
-            interval_minutes=activity_schedule.interval_minutes,
-            next_run_at=activity_schedule.next_run_at,
-            last_run_at=activity_schedule.last_run_at,
-            timezone=activity_schedule.timezone,
-            is_enabled=activity_schedule.is_enabled,
-        )
+        model = activity_schedule_entity_to_model(activity_schedule_entity=activity_schedule)
         self.session.add(model)
         await self.session.commit()
         await self.session.refresh(model)
-        return SavedActivityScheduleEntity(
-            id=model.id,
-            activity_id=model.activity_id,
-            schedule_type=ActivityScheduleType(model.schedule_type),
-            interval_minutes=model.interval_minutes,
-            next_run_at=model.next_run_at,
-            last_run_at=model.last_run_at,
-            timezone=model.timezone,
-            is_enabled=model.is_enabled,
-            created_at=model.created_at,
-            updated_at=model.updated_at,
-        )
+        return activity_schedule_model_to_entity(activity_schedule_model=model)
 
     async def get_due_activity_schedules(self, now: datetime) -> list[SavedActivityScheduleEntity]:
         result = await self.session.execute(
@@ -46,18 +29,4 @@ class ActivityScheduleRepository:
             )
         )
         models = result.scalars().all()
-        return [
-            SavedActivityScheduleEntity(
-                id=model.id,
-                activity_id=model.activity_id,
-                schedule_type=ActivityScheduleType(model.schedule_type),
-                interval_minutes=model.interval_minutes,
-                next_run_at=model.next_run_at,
-                last_run_at=model.last_run_at,
-                timezone=model.timezone,
-                is_enabled=model.is_enabled,
-                created_at=model.created_at,
-                updated_at=model.updated_at,
-            )
-            for model in models
-        ]
+        return [activity_schedule_model_to_entity(activity_schedule_model=model) for model in models]

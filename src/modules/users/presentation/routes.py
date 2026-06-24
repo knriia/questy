@@ -2,8 +2,8 @@ from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter
 
 from src.modules.users.application.service import UserService
-from src.modules.users.domain.entities import UserEntity
 from src.modules.users.presentation.dto import UserCreateDTO, UserReadDTO
+from src.modules.users.presentation.mappers import user_dto_to_entity, user_entity_to_dto
 
 user_router = APIRouter(prefix="/users", tags=["users"])
 
@@ -11,19 +11,5 @@ user_router = APIRouter(prefix="/users", tags=["users"])
 @user_router.post("")
 @inject
 async def create_user(user_dto: UserCreateDTO, service: FromDishka[UserService]) -> UserReadDTO:
-    user = UserEntity.create(
-        nickname=user_dto.nickname,
-        username=user_dto.username,
-        email=user_dto.email,
-        telegram_id=user_dto.telegram_id,
-    )
-    created_user = await service.create_user(user=user)
-    return UserReadDTO(
-        id=created_user.id,
-        nickname=created_user.nickname,
-        username=created_user.username,
-        email=created_user.email,
-        telegram_id=created_user.telegram_id,
-        created_at=created_user.created_at,
-        updated_at=created_user.updated_at,
-    )
+    user = user_dto_to_entity(user_dto=user_dto)
+    return user_entity_to_dto(user_entity=await service.create_user(user=user))
