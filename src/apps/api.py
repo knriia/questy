@@ -5,12 +5,14 @@ from fastapi import FastAPI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from di.container import container
+from di.container import create_container
 from src.core.logger import logger
 from src.modules.activities.presentation.routes.activity import activity_router
 from src.modules.activities.presentation.routes.activity_schedule import activity_schedule_router
 from src.modules.activity_records.presentation.routes import activity_record_router
 from src.modules.users.presentation.routes import user_router
+
+container = create_container()
 
 
 @asynccontextmanager

@@ -62,5 +62,28 @@ services:
 
     restart: unless-stopped
 
+  redis:
+    container_name: redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  scheduler:
+    container_name: scheduler
+    command: python -m src.apps.scheduler
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
 volumes:
   postgres_data:
+  redis_data:

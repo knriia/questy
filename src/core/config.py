@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     DB_NAME: str
     DB_USER: str
     DB_PASSWORD: str
+    REDIS_URL: str
 
     model_config = SettingsConfigDict(
         env_file=".env",

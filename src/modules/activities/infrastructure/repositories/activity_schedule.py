@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
-from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
@@ -34,20 +33,23 @@ class ActivityScheduleRepository:
 
     async def update_next_run_activity_schedule(
         self,
-        activity_schedule_id: UUID,
+        activity_schedule: SavedActivityScheduleEntity,
         now: datetime,
     ) -> SavedActivityScheduleEntity:
-        activity_schedule = await self.session.get(ActivityScheduleModel, activity_schedule_id)
-        if not activity_schedule:
-            raise ValueError("Напоминание не найдено")
-
         interval_minutes = activity_schedule.interval_minutes
         if interval_minutes is None:
             raise ValueError("Напоминание не является интервальным")
 
-        activity_schedule.next_run_at = timedelta(minutes=float(interval_minutes)) + now
-        activity_schedule.last_run_at = now
-        self.session.add(activity_schedule)
+        stmt = (
+            update(ActivityScheduleModel)
+            .where(ActivityScheduleModel.id == activity_schedule.id)
+            .values(
+                next_run_at=now + timedelta(minutes=float(interval_minutes)),
+                last_run_at=now,
+            )
+            .returning(ActivityScheduleModel)
+        )
+        result = await self.session.execute(stmt)
         await self.session.commit()
-        await self.session.refresh(activity_schedule)
-        return activity_schedule_model_to_entity(activity_schedule_model=activity_schedule)
+        activity_model = result.scalar_one()
+        return activity_schedule_model_to_entity(activity_schedule_model=activity_model)
