@@ -1,5 +1,4 @@
 from datetime import datetime
-from uuid import UUID
 
 from src.modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
 from src.modules.activities.infrastructure.repositories.activity_schedule import ActivityScheduleRepository
@@ -17,10 +16,10 @@ class ActivityScheduleService:
 
     async def update_next_run_activity_schedule(
         self,
-        activity_schedule_id: UUID,
+        activity_schedule: SavedActivityScheduleEntity,
         now: datetime,
     ) -> SavedActivityScheduleEntity:
         return await self.repository.update_next_run_activity_schedule(
-            activity_schedule_id=activity_schedule_id,
+            activity_schedule=activity_schedule,
             now=now,
         )
