@@ -1,15 +1,15 @@
 from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.modules.activities.application.services.activity import ActivityService
-from src.modules.activities.application.services.activity_schedule import ActivityScheduleService
-from src.modules.activities.application.services.activity_schedule_dispatcher import (
+from modules.activities.application.services.activity import ActivityService
+from modules.activities.application.services.activity_schedule import ActivityScheduleService
+from modules.activities.application.services.activity_schedule_dispatcher import (
     ActivityNotificationTaskSender,
     ActivityScheduleDispatcher,
 )
-from src.modules.activities.infrastructure.repositories.activity import ActivityRepository
-from src.modules.activities.infrastructure.repositories.activity_schedule import ActivityScheduleRepository
-from src.modules.activities.presentation.tasks import send_activity_notification
+from modules.activities.infrastructure.repositories.activity import ActivityRepository
+from modules.activities.infrastructure.repositories.activity_schedule import ActivityScheduleRepository
+from modules.activities.presentation.tasks import send_activity_notification
 
 
 class ActivityProvider(Provider):

@@ -1,8 +1,8 @@
 import asyncio
 from datetime import UTC, datetime
 
-from di.container import create_container
-from src.modules.activities.application.services.activity_schedule_dispatcher import ActivityScheduleDispatcher
+from entrypoints.container import create_container
+from modules.activities.application.services.activity_schedule_dispatcher import ActivityScheduleDispatcher
 
 
 async def run_scheduler():

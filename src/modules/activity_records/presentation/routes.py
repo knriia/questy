@@ -1,9 +1,9 @@
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter
 
-from src.modules.activity_records.application.service import ActivityRecordService
-from src.modules.activity_records.presentation.dto import ActivityRecordCreateDTO, ActivityRecordReadDTO
-from src.modules.activity_records.presentation.mappers import (
+from modules.activity_records.application.service import ActivityRecordService
+from modules.activity_records.presentation.dto import ActivityRecordCreateDTO, ActivityRecordReadDTO
+from modules.activity_records.presentation.mappers import (
     activity_record_dto_to_entity,
     activity_record_entity_to_dto,
 )

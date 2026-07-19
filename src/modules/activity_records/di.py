@@ -1,8 +1,8 @@
 from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.modules.activity_records.application.service import ActivityRecordService
-from src.modules.activity_records.infrastructure.repository import ActivityRecordRepository
+from modules.activity_records.application.service import ActivityRecordService
+from modules.activity_records.infrastructure.repository import ActivityRecordRepository
 
 
 class ActivityRecordProvider(Provider):

@@ -1,11 +1,11 @@
 from dishka import AsyncContainer, make_async_container
 
-from src.core.db.di import DbProvider
-from src.core.di import SettingsProvider
-from src.integrations.telegram.di import TelegramSenderProvider
-from src.modules.activities.di import ActivityProvider, ActivityScheduleProvider
-from src.modules.activity_records.di import ActivityRecordProvider
-from src.modules.users.di import UserProvider
+from integrations.telegram.di import TelegramSenderProvider
+from modules.activities.di import ActivityProvider, ActivityScheduleProvider
+from modules.activity_records.di import ActivityRecordProvider
+from modules.users.di import UserProvider
+from shared.db.di import DbProvider
+from shared.di import SettingsProvider
 
 
 def create_container() -> AsyncContainer:

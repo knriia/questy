@@ -3,12 +3,12 @@ from datetime import datetime, timedelta
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
-from src.modules.activities.infrastructure.mappers.activity_schedule import (
+from modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
+from modules.activities.infrastructure.mappers.activity_schedule import (
     activity_schedule_entity_to_model,
     activity_schedule_model_to_entity,
 )
-from src.modules.activities.infrastructure.models.activity_schedule import ActivityScheduleModel
+from modules.activities.infrastructure.models.activity_schedule import ActivityScheduleModel
 
 
 class ActivityScheduleRepository:

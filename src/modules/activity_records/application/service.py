@@ -1,5 +1,5 @@
-from src.modules.activity_records.domain.entities import ActivityRecordEntity, SavedActivityRecordEntity
-from src.modules.activity_records.infrastructure.repository import ActivityRecordRepository
+from modules.activity_records.domain.entities import ActivityRecordEntity, SavedActivityRecordEntity
+from modules.activity_records.infrastructure.repository import ActivityRecordRepository
 
 
 class ActivityRecordService:

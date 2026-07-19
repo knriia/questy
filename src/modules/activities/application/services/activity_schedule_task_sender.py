@@ -1,6 +1,6 @@
 from collections.abc import Awaitable, Callable
 
-from src.modules.activities.presentation.dto.activity_schedule_notification import ActivityScheduleNotificationPayload
+from modules.activities.presentation.dto.activity_schedule_notification import ActivityScheduleNotificationPayload
 
 
 class ActivityNotificationTaskSender:

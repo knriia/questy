@@ -1,7 +1,7 @@
 from dishka import Provider, Scope, provide
 
-from src.core.config import Settings
-from src.integrations.telegram.sender import TelegramSender
+from integrations.telegram.sender import TelegramSender
+from shared.config import Settings
 
 
 class TelegramSenderProvider(Provider):

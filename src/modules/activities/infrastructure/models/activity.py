@@ -5,7 +5,7 @@ from sqlalchemy import UUID, DateTime, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.core.db.base import Base
+from shared.db.base import Base
 
 
 class ActivityModel(Base):

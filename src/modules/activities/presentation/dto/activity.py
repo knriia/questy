@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from src.modules.activities.enums import ActivityStatus, ActivityType
+from modules.activities.enums import ActivityStatus, ActivityType
 
 
 class ActivityCreateDTO(BaseModel):

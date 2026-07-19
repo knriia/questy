@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from src.modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
-from src.modules.activities.infrastructure.repositories.activity_schedule import ActivityScheduleRepository
+from modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
+from modules.activities.infrastructure.repositories.activity_schedule import ActivityScheduleRepository
 
 
 class ActivityScheduleService:

@@ -1,9 +1,9 @@
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter
 
-from src.modules.activities.application.services.activity import ActivityService
-from src.modules.activities.presentation.dto.activity import ActivityCreateDTO, ActivityReadDTO
-from src.modules.activities.presentation.mappers.activity import activity_dto_to_entity, activity_entity_to_dto
+from modules.activities.application.services.activity import ActivityService
+from modules.activities.presentation.dto.activity import ActivityCreateDTO, ActivityReadDTO
+from modules.activities.presentation.mappers.activity import activity_dto_to_entity, activity_entity_to_dto
 
 activity_router = APIRouter(prefix="/activities", tags=["activities"])
 

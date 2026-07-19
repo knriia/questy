@@ -2,10 +2,14 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+RUN pip install --no-cache-dir uv
 
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml uv.lock README.md ./
 
-COPY . .
+COPY src ./src
 
-CMD ["uvicorn", "src.apps.api:app", "--host", "0.0.0.0", "--port", "8000"]
+RUN uv sync --locked --no-dev
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+CMD ["uvicorn", "entrypoints.api:app", "--host", "0.0.0.0", "--port", "8000"]
