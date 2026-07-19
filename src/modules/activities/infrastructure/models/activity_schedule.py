@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import UUID, Boolean, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.core.db.base import Base
+from shared.db.base import Base
 
 
 class ActivityScheduleModel(Base):

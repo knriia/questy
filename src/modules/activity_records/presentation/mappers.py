@@ -1,5 +1,5 @@
-from src.modules.activity_records.domain.entities import ActivityRecordEntity, SavedActivityRecordEntity
-from src.modules.activity_records.presentation.dto import ActivityRecordCreateDTO, ActivityRecordReadDTO
+from modules.activity_records.domain.entities import ActivityRecordEntity, SavedActivityRecordEntity
+from modules.activity_records.presentation.dto import ActivityRecordCreateDTO, ActivityRecordReadDTO
 
 
 def activity_record_entity_to_dto(activity_record_entity: SavedActivityRecordEntity) -> ActivityRecordReadDTO:

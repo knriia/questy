@@ -1,5 +1,5 @@
-from src.modules.users.domain.entities import SavedUserEntity, UserEntity
-from src.modules.users.presentation.dto import UserCreateDTO, UserReadDTO
+from modules.users.domain.entities import SavedUserEntity, UserEntity
+from modules.users.presentation.dto import UserCreateDTO, UserReadDTO
 
 
 def user_entity_to_dto(user_entity: SavedUserEntity) -> UserReadDTO:

@@ -4,7 +4,7 @@ from uuid import UUID
 
 from uuid6 import uuid6
 
-from src.modules.activities.enums import ActivityScheduleType
+from modules.activities.enums import ActivityScheduleType
 
 
 @dataclass(kw_only=True)

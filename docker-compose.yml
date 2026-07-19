@@ -73,7 +73,7 @@ services:
 
   scheduler:
     container_name: scheduler
-    command: python -m src.apps.scheduler
+    command: python -m entrypoints.scheduler
     build: .
     env_file:
       - .env
@@ -86,7 +86,7 @@ services:
 
   worker:
     container_name: worker
-    command: taskiq worker src.apps.worker:broker
+    command: taskiq worker entrypoints.worker:broker
     build: .
     env_file:
       - .env

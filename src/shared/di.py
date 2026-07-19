@@ -1,6 +1,6 @@
 from dishka import Provider, Scope, provide
 
-from src.core.config import Settings
+from shared.config import Settings
 
 
 class SettingsProvider(Provider):

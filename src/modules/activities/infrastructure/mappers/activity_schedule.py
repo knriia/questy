@@ -1,6 +1,6 @@
-from src.modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
-from src.modules.activities.enums import ActivityScheduleType
-from src.modules.activities.infrastructure.models.activity_schedule import ActivityScheduleModel
+from modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
+from modules.activities.enums import ActivityScheduleType
+from modules.activities.infrastructure.models.activity_schedule import ActivityScheduleModel
 
 
 def activity_schedule_entity_to_model(activity_schedule_entity: ActivityScheduleEntity) -> ActivityScheduleModel:

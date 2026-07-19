@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.modules.activities.domain.entities.activity import ActivityEntity, SavedActivityEntity
-from src.modules.activities.infrastructure.mappers.activity import activity_entity_to_model, activity_model_to_entity
+from modules.activities.domain.entities.activity import ActivityEntity, SavedActivityEntity
+from modules.activities.infrastructure.mappers.activity import activity_entity_to_model, activity_model_to_entity
 
 
 class ActivityRepository:

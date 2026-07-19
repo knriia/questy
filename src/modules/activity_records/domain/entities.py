@@ -4,7 +4,7 @@ from uuid import UUID
 
 from uuid6 import uuid6
 
-from src.modules.activity_records.enums import ActivityRecordStatus
+from modules.activity_records.enums import ActivityRecordStatus
 
 
 @dataclass

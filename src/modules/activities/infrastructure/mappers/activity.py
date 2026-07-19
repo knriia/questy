@@ -1,6 +1,6 @@
-from src.modules.activities.domain.entities.activity import ActivityEntity, SavedActivityEntity
-from src.modules.activities.enums import ActivityStatus, ActivityType
-from src.modules.activities.infrastructure.models.activity import ActivityModel
+from modules.activities.domain.entities.activity import ActivityEntity, SavedActivityEntity
+from modules.activities.enums import ActivityStatus, ActivityType
+from modules.activities.infrastructure.models.activity import ActivityModel
 
 
 def activity_entity_to_model(activity_entity: ActivityEntity) -> ActivityModel:

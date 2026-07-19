@@ -1,5 +1,5 @@
-from src.modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
-from src.modules.activities.presentation.dto.activity_schedule import ActivityScheduleCreateDTO, ActivityScheduleReadDTO
+from modules.activities.domain.entities.activity_schedule import ActivityScheduleEntity, SavedActivityScheduleEntity
+from modules.activities.presentation.dto.activity_schedule import ActivityScheduleCreateDTO, ActivityScheduleReadDTO
 
 
 def activity_schedule_entity_to_dto(activity_schedule_entity: SavedActivityScheduleEntity) -> ActivityScheduleReadDTO:

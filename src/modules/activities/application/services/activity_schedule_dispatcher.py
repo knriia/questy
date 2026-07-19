@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from src.modules.activities.application.services.activity_schedule import ActivityScheduleService
-from src.modules.activities.application.services.activity_schedule_task_sender import ActivityNotificationTaskSender
-from src.modules.activities.presentation.dto.activity_schedule_notification import ActivityScheduleNotificationPayload
+from modules.activities.application.services.activity_schedule import ActivityScheduleService
+from modules.activities.application.services.activity_schedule_task_sender import ActivityNotificationTaskSender
+from modules.activities.presentation.dto.activity_schedule_notification import ActivityScheduleNotificationPayload
 
 
 class ActivityScheduleDispatcher:

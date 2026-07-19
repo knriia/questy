@@ -3,9 +3,9 @@ from datetime import datetime
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter
 
-from src.modules.activities.application.services.activity_schedule import ActivityScheduleService
-from src.modules.activities.presentation.dto.activity_schedule import ActivityScheduleCreateDTO, ActivityScheduleReadDTO
-from src.modules.activities.presentation.mappers.activity_schedule import (
+from modules.activities.application.services.activity_schedule import ActivityScheduleService
+from modules.activities.presentation.dto.activity_schedule import ActivityScheduleCreateDTO, ActivityScheduleReadDTO
+from modules.activities.presentation.mappers.activity_schedule import (
     activity_schedule_dto_to_entity,
     activity_schedule_entity_to_dto,
 )

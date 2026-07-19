@@ -1,0 +1,7 @@
+  .env
+  .git
+  .venv
+  .idea
+  .ruff_cache
+  __pycache__
+  *.pyc

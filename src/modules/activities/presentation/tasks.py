@@ -1,6 +1,6 @@
-from src.core.logger import logger
-from src.core.taskiq import broker
-from src.modules.activities.presentation.dto.activity_schedule_notification import ActivityScheduleNotificationPayload
+from modules.activities.presentation.dto.activity_schedule_notification import ActivityScheduleNotificationPayload
+from shared.logger import logger
+from shared.taskiq import broker
 
 
 @broker.task
