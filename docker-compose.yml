@@ -84,6 +84,19 @@ services:
         condition: service_started
     restart: unless-stopped
 
+  worker:
+    container_name: worker
+    command: taskiq worker src.apps.worker:broker
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   redis_data:

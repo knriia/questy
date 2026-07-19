@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASSWORD: str
     REDIS_URL: str
+    TELEGRAM_BOT_TOKEN: str
 
     model_config = SettingsConfigDict(
         env_file=".env",

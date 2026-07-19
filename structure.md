@@ -2,6 +2,11 @@ questy/
 ├── di/
 │   └── container.py
 ├── src/
+│   ├── apps/
+│   │   ├── __init__.py
+│   │   ├── api.py
+│   │   ├── scheduler.py
+│   │   └── worker.py
 │   ├── core/
 │   │   ├── db/
 │   │   │   ├── __init__.py
@@ -10,16 +15,21 @@ questy/
 │   │   ├── __init__.py
 │   │   ├── config.py
 │   │   ├── di.py
-│   │   └── logger.py
+│   │   ├── logger.py
+│   │   └── taskiq.py
 │   ├── integrations/
 │   │   └── telegram/
+│   │       ├── di.py
+│   │       └── sender.py
 │   ├── modules/
 │   │   ├── activities/
 │   │   │   ├── application/
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── __init__.py
 │   │   │   │   │   ├── activity.py
-│   │   │   │   │   └── activity_schedule.py
+│   │   │   │   │   ├── activity_schedule.py
+│   │   │   │   │   ├── activity_schedule_dispatcher.py
+│   │   │   │   │   └── activity_schedule_task_sender.py
 │   │   │   │   └── __init__.py
 │   │   │   ├── domain/
 │   │   │   │   ├── entities/
@@ -45,7 +55,8 @@ questy/
 │   │   │   │   ├── dto/
 │   │   │   │   │   ├── __init__.py
 │   │   │   │   │   ├── activity.py
-│   │   │   │   │   └── activity_schedule.py
+│   │   │   │   │   ├── activity_schedule.py
+│   │   │   │   │   └── activity_schedule_notification.py
 │   │   │   │   ├── mappers/
 │   │   │   │   │   ├── __init__.py
 │   │   │   │   │   ├── activity.py
@@ -54,7 +65,8 @@ questy/
 │   │   │   │   │   ├── __init__.py
 │   │   │   │   │   ├── activity.py
 │   │   │   │   │   └── activity_schedule.py
-│   │   │   │   └── __init__.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── tasks.py
 │   │   │   ├── __init__.py
 │   │   │   ├── di.py
 │   │   │   └── enums.py
@@ -89,10 +101,7 @@ questy/
 │   │   │   │   └── routes.py
 │   │   │   └── di.py
 │   │   └── __init__.py
-│   ├── scheduler/
-│   │   └── engine.py
-│   ├── __init__.py
-│   └── main.py
+│   └── __init__.py
 ├── alembic.ini
 ├── docker-compose.yml
 ├── Dockerfile
