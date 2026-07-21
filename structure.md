@@ -1,26 +1,16 @@
 questy/
-├── di/
-│   └── container.py
 ├── src/
-│   ├── apps/
+│   ├── entrypoints/
 │   │   ├── __init__.py
 │   │   ├── api.py
+│   │   ├── container.py
 │   │   ├── scheduler.py
 │   │   └── worker.py
-│   ├── core/
-│   │   ├── db/
-│   │   │   ├── __init__.py
-│   │   │   ├── base.py
-│   │   │   └── di.py
-│   │   ├── __init__.py
-│   │   ├── config.py
-│   │   ├── di.py
-│   │   ├── logger.py
-│   │   └── taskiq.py
 │   ├── integrations/
-│   │   └── telegram/
-│   │       ├── di.py
-│   │       └── sender.py
+│   │   ├── telegram/
+│   │   │   ├── di.py
+│   │   │   └── sender.py
+│   │   └── __init__.py
 │   ├── modules/
 │   │   ├── activities/
 │   │   │   ├── application/
@@ -88,19 +78,51 @@ questy/
 │   │   ├── courses/
 │   │   ├── users/
 │   │   │   ├── application/
+│   │   │   │   ├── dto.py
 │   │   │   │   └── service.py
 │   │   │   ├── domain/
-│   │   │   │   └── entities.py
+│   │   │   │   ├── entities/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── user.py
+│   │   │   │   │   └── user_credential.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── enums.py
+│   │   │   │   ├── exceptions.py
+│   │   │   │   └── value_objects.py
 │   │   │   ├── infrastructure/
-│   │   │   │   ├── mappers.py
-│   │   │   │   ├── models.py
-│   │   │   │   └── repository.py
+│   │   │   │   ├── mappers/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── user.py
+│   │   │   │   │   └── user_credential.py
+│   │   │   │   ├── models/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── user_credential_model.py
+│   │   │   │   │   └── user_model.py
+│   │   │   │   ├── repositories/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── user_credential_repository.py
+│   │   │   │   │   └── user_repository.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── password_hasher.py
 │   │   │   ├── presentation/
 │   │   │   │   ├── dto.py
+│   │   │   │   ├── exception_handlers.py
 │   │   │   │   ├── mappers.py
 │   │   │   │   └── routes.py
+│   │   │   ├── __init__.py
 │   │   │   └── di.py
 │   │   └── __init__.py
+│   ├── shared/
+│   │   ├── db/
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   └── di.py
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   ├── di.py
+│   │   ├── logger.py
+│   │   ├── taskiq.py
+│   │   └── uow.py
 │   └── __init__.py
 ├── alembic.ini
 ├── docker-compose.yml
@@ -108,4 +130,6 @@ questy/
 ├── Makefile
 ├── pyproject.toml
 ├── README.md
-└── requirements.txt
+├── task.md
+├── tz.md
+└── uv.lock

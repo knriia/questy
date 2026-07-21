@@ -9,7 +9,7 @@ from shared.config import Settings
 class DbProvider(Provider):
     @provide(scope=Scope.APP)
     def engine(self, settings: Settings) -> AsyncEngine:
-        return create_async_engine(settings.db_url, echo=True)
+        return create_async_engine(settings.db_url, echo=False)
 
     @provide(scope=Scope.APP)
     def session_factory(self, engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
