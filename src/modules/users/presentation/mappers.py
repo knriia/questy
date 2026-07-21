@@ -1,23 +1,26 @@
-from modules.users.domain.entities import SavedUserEntity, UserEntity
+from modules.users.application.dto import RegisterUserInput
+from modules.users.domain.entities.user import UserEntity
 from modules.users.presentation.dto import UserCreateDTO, UserReadDTO
 
 
-def user_entity_to_dto(user_entity: SavedUserEntity) -> UserReadDTO:
+def user_entity_to_dto(user_entity: UserEntity) -> UserReadDTO:
     return UserReadDTO(
         id=user_entity.id,
-        nickname=user_entity.nickname,
-        username=user_entity.username,
-        email=user_entity.email,
-        telegram_id=user_entity.telegram_id,
+        username=user_entity.username.value,
+        timezone=user_entity.timezone.value,
+        status=user_entity.status,
+        email=user_entity.email.value,
+        email_verified=user_entity.email_verified,
         created_at=user_entity.created_at,
         updated_at=user_entity.updated_at,
+        deleted_at=user_entity.deleted_at,
     )
 
 
-def user_dto_to_entity(user_dto: UserCreateDTO) -> UserEntity:
-    return UserEntity.create(
-        nickname=user_dto.nickname,
+def api_user_dto_to_application_user_dto(user_dto: UserCreateDTO) -> RegisterUserInput:
+    return RegisterUserInput(
         username=user_dto.username,
+        timezone=user_dto.timezone,
         email=user_dto.email,
-        telegram_id=user_dto.telegram_id,
+        password=user_dto.password,
     )

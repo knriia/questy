@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from dishka.integrations.fastapi import FromDishka, inject, setup_dishka
@@ -9,10 +10,14 @@ from entrypoints.container import create_container
 from modules.activities.presentation.routes.activity import activity_router
 from modules.activities.presentation.routes.activity_schedule import activity_schedule_router
 from modules.activity_records.presentation.routes import activity_record_router
+from modules.users.presentation.exception_handlers import setup_user_exception_handlers
 from modules.users.presentation.routes import user_router
-from shared.logger import logger
+from shared.logger import setup_logging
 
+setup_logging()
 container = create_container()
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -24,6 +29,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+setup_user_exception_handlers(app)
+
 app.include_router(user_router)
 app.include_router(activity_router)
 app.include_router(activity_record_router)
