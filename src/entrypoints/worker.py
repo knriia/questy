@@ -1,6 +1,6 @@
 import logging
 
-from modules.activities.presentation.tasks import send_activity_notification
+from modules.activity.presentation.tasks import send_activity_notification
 from shared.logger import setup_logging
 from shared.taskiq import broker
 

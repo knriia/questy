@@ -9,6 +9,14 @@ class Settings(BaseSettings):
     DB_PASSWORD: str
     REDIS_URL: str
     TELEGRAM_BOT_TOKEN: str
+    DEVICE_ID_HMAC_KEY: str
+    AUTH_SESSION_TTL_SECONDS: int
+    ACCESS_TOKEN_TTL_SECONDS: int
+    REFRESH_TOKEN_HMAC_KEY: str
+    ACCESS_TOKEN_HMAC_KEY: str
+    CSRF_HMAC_KEY: str
+    JWT_ISSUER: str
+    JWT_AUDIENCE: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
