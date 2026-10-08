@@ -3,7 +3,7 @@ import logging
 from datetime import UTC, datetime
 
 from entrypoints.container import create_container
-from modules.activities.application.services.activity_schedule_dispatcher import ActivityScheduleDispatcher
+from modules.activity.application.services.activity_schedule_dispatcher import ActivityScheduleDispatcher
 from shared.logger import setup_logging
 
 setup_logging()
