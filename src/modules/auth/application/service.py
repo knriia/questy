@@ -8,20 +8,20 @@ from uuid import UUID, uuid7
 import jwt
 
 from modules.auth.application.dto import UserAuthCredentialCommand, UserAuthSessionResult, UserRegisterCommand
+from modules.auth.application.interface.credential import IAuthCredentialRepository
+from modules.auth.application.interface.refresh_token import IRefreshTokenRepository
+from modules.auth.application.interface.session import IAuthSessionRepository
 from modules.auth.domain.entities.credential import AuthCredentialEntity
 from modules.auth.domain.entities.refresh_token import AuthRefreshTokenEntity
 from modules.auth.domain.entities.session import AuthSessionEntity
 from modules.auth.domain.exceptions import CredentialsValidationError
 from modules.auth.domain.value_objects import Password
 from modules.auth.infrastructure.password_hasher import Argon2PasswordHasher
-from modules.auth.infrastructure.repositories.credential import AuthCredentialRepository
-from modules.auth.infrastructure.repositories.refresh_token import RefreshTokenRepository
-from modules.auth.infrastructure.repositories.session import AuthSessionRepository
 from modules.user.application.dto import UserCommand, UserResult
 from modules.user.application.service import UserService
 from modules.user.domain.entities import UserEntity
 from shared.config import Settings
-from shared.uow import UoW
+from shared.iuow import IUoW
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +30,10 @@ class AuthService:
     def __init__(
         self,
         user_service: UserService,
-        auth_credential_repo: AuthCredentialRepository,
-        auth_session_repo: AuthSessionRepository,
-        refresh_token_repo: RefreshTokenRepository,
-        uow: UoW,
+        auth_credential_repo: IAuthCredentialRepository,
+        auth_session_repo: IAuthSessionRepository,
+        refresh_token_repo: IRefreshTokenRepository,
+        uow: IUoW,
         password_hash: Argon2PasswordHasher,
         settings: Settings,
     ):

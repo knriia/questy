@@ -2,6 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from modules.auth.application.interface.credential import IAuthCredentialRepository
 from modules.auth.domain.entities.credential import AuthCredentialEntity
 from modules.auth.infrastructure.mappers.credential import (
     auth_credential_entity_to_model,
@@ -10,7 +11,7 @@ from modules.auth.infrastructure.mappers.credential import (
 from modules.auth.infrastructure.models.credential import AuthCredentialModel
 
 
-class AuthCredentialRepository:
+class AuthCredentialRepository(IAuthCredentialRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
 

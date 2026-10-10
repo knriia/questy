@@ -29,6 +29,9 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pre-commit==4.6.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
     "ruff==0.16.10",
 ]
 
@@ -44,7 +47,7 @@ select = [
     "FAST", "PYI"
 ]
 
-ignore = ["D", "ANN401", "B008", "S101", "RUF001", "RUF002", "RUF003"]
+ignore = ["D", "ANN401", "B008", "S101", "RUF001", "RUF002", "RUF003", "PYI034"]
 
 [tool.ruff.lint.flake8-annotations]
 ignore-fully-untyped = false
@@ -61,3 +64,15 @@ packages = [
     "src/integrations",
     "src/modules",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+markers = [
+    "unit: tests of individual components",
+    "integration_no_db: tests of component interactions without a database",
+    "integration_db: tests using PostgreSQL and project migrations",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S105", "S106"]

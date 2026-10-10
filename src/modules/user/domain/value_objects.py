@@ -15,7 +15,8 @@ class Username:
         if not 3 <= len(normalized) <= 30:
             raise InvalidUsernameError("Username must contain between 3 and 30 characters")
 
-        if not normalized.replace("_", "").isalnum():
+        without_underscores = normalized.replace("_", "")
+        if not without_underscores.isalnum() or not without_underscores.isascii():
             raise InvalidUsernameError("Username may contain only letters, numbers, and underscores")
 
         if not normalized[0].isalpha():
@@ -30,12 +31,16 @@ class Email:
 
     def __post_init__(self):
         try:
-            result = validate_email(self.value.strip(), check_deliverability=False)
+            validate_result = validate_email(self.value.strip(), check_deliverability=False)
 
         except EmailNotValidError as error:
             raise InvalidEmailError("Email has invalid format") from error
 
-        object.__setattr__(self, "value", result.normalized.lower())
+        normalized_result = validate_result.normalized.lower()
+        if len(normalized_result) > 100:
+            raise InvalidEmailError("Email must contain no more than 100 characters")
+
+        object.__setattr__(self, "value", normalized_result)
 
 
 @dataclass(frozen=True, slots=True)

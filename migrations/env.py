@@ -6,21 +6,20 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from modules.activity.infrastructure import models as activity_models  # noqa: F401
+from modules.activity_record.infrastructure.models import ActivityRecordModel  # noqa: F401
+from modules.auth.infrastructure import models as auth_models  # noqa: F401
+from modules.user.infrastructure.models import UserModel  # noqa: F401
 from shared.config import Settings
 from shared.db.base import Base
-from modules.user.infrastructure.models import UserModel
-from modules.auth.infrastructure import models as auth_models
-from modules.activity_record.infrastructure.models import ActivityRecordModel
-from modules.activity.infrastructure import models as activity_models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-settings = Settings()
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-if config.config_file_name is not None:
+if config.config_file_name is not None and config.attributes.get("connection") is None:
     fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
@@ -48,7 +47,7 @@ def run_migrations_offline() -> None:
 
     """
 
-    url = settings.db_url
+    url = Settings().db_url
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -72,7 +71,7 @@ def do_run_migrations(connection: Connection) -> None:
 
 async def run_async_migrations() -> None:
     configuration = config.get_section(config.config_ini_section, {})
-    configuration["sqlalchemy.url"] = settings.db_url
+    configuration["sqlalchemy.url"] = Settings().db_url
 
     connectable = async_engine_from_config(
         configuration,
@@ -87,7 +86,11 @@ async def run_async_migrations() -> None:
 
 
 def run_migrations_online() -> None:
-    asyncio.run(run_async_migrations())
+    connection = config.attributes.get("connection")
+    if connection is not None:
+        do_run_migrations(connection)
+    else:
+        asyncio.run(run_async_migrations())
 
 
 if context.is_offline_mode():

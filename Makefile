@@ -1,4 +1,5 @@
-.PHONY: help up down logs restart shell ps build rebuild down-v ps-a migrate create_migration downgrade rollback_to
+.PHONY: help up down logs restart shell ps build rebuild down-v ps-a migrate create_migration downgrade rollback_to prepare-test-db
+.PHONY: test-unit test-integration-no-db test-integration-db
 
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 SERVICE := $(firstword $(ARGS))
@@ -22,6 +23,10 @@ help:
 	@echo "  make ps                            Show running containers"
 	@echo "  make ps-a                          Show all containers"
 	@echo "  make migrate                       Apply migrations"
+	@echo "  make prepare-test-db               Create PostgreSQL role from .env.test"
+	@echo "  make test-unit                     Run unit tests locally"
+	@echo "  make test-integration-no-db        Run integration tests without a database locally"
+	@echo "  make test-integration-db           Run PostgreSQL integration tests in a container"
 	@echo "  make downgrade                     Rollback last migration (-1)"
 	@echo "  make rollback_to <revision_id>     Rollback to specific revision ID"
 	@echo "  make create_migration <name>       Create new alembic migration"
@@ -72,6 +77,23 @@ ps-a:
 
 migrate:
 	docker compose run --rm migrations
+
+prepare-test-db:
+	.venv/bin/python -m tests.support.prepare_database
+
+test-unit:
+	.venv/bin/pytest -q --strict-markers -m unit
+
+test-integration-no-db:
+	.venv/bin/pytest -q --strict-markers -m integration_no_db
+
+test-integration-db:
+	docker run --rm --network container:app \
+		-v "$(CURDIR):/workspace:ro" -w /workspace \
+		-e PYTHONPATH=/workspace/.venv/lib/python3.14/site-packages:/workspace/src \
+		-e PYTHONDONTWRITEBYTECODE=1 \
+		--entrypoint /app/.venv/bin/python \
+		questy-app -m pytest -q --strict-markers -p no:cacheprovider -m integration_db
 
 create_migration:
 	@if [ -z "$(ARGS)" ]; then \
