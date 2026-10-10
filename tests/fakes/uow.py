@@ -1,21 +1,21 @@
 from types import TracebackType
-
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Self
 
 from shared.iuow import IUoW
 
 
-class UoW(IUoW):
-    def __init__(self, session: AsyncSession):
-        self._session = session
+class FakeUoW(IUoW):
+    def __init__(self) -> None:
+        self.commit_count = 0
+        self.rollback_count = 0
 
     async def commit(self) -> None:
-        await self._session.commit()
+        self.commit_count += 1
 
     async def rollback(self) -> None:
-        await self._session.rollback()
+        self.rollback_count += 1
 
-    async def __aenter__(self) -> UoW:
+    async def __aenter__(self) -> Self:
         return self
 
     async def __aexit__(

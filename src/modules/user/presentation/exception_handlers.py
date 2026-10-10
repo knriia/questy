@@ -19,7 +19,7 @@ async def handle_user_validation_error(
     )
 
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content={
             "detail": {
                 "code": error.code,

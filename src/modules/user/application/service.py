@@ -1,10 +1,10 @@
 import logging
 
 from modules.user.application.dto import UserCommand, UserResult
+from modules.user.application.interface import IUserRepository
 from modules.user.domain.entities import UserEntity
 from modules.user.domain.value_objects import Email, Timezone, Username
-from modules.user.infrastructure.repositories import UserRepository
-from shared.uow import UoW
+from shared.iuow import IUoW
 
 logger = logging.getLogger(__name__)
 
@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 class UserService:
     def __init__(
         self,
-        user_repo: UserRepository,
-        uow: UoW,
+        user_repo: IUserRepository,
+        uow: IUoW,
     ):
         self._user_repo = user_repo
         self._uow = uow

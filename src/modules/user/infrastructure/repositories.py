@@ -2,13 +2,14 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from modules.user.application.interface import IUserRepository
 from modules.user.domain.entities import UserEntity
 from modules.user.domain.exceptions import EmailAlreadyExistsError, UsernameAlreadyExistsError
 from modules.user.infrastructure.mappers import user_entity_to_model, user_model_to_entity
 from modules.user.infrastructure.models import UserModel
 
 
-class UserRepository:
+class UserRepository(IUserRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
 
