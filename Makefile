@@ -1,5 +1,5 @@
 .PHONY: help up down logs restart shell ps build rebuild down-v ps-a migrate create_migration downgrade rollback_to prepare-test-db
-.PHONY: test-unit test-integration-no-db test-integration-db
+.PHONY: test-unit test-integration-no-db test-integration-db test-coverage
 
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 SERVICE := $(firstword $(ARGS))
@@ -27,6 +27,7 @@ help:
 	@echo "  make test-unit                     Run unit tests locally"
 	@echo "  make test-integration-no-db        Run integration tests without a database locally"
 	@echo "  make test-integration-db           Run PostgreSQL integration tests in a container"
+	@echo "  make test-coverage                 Run all tests with line and branch coverage reports"
 	@echo "  make downgrade                     Rollback last migration (-1)"
 	@echo "  make rollback_to <revision_id>     Rollback to specific revision ID"
 	@echo "  make create_migration <name>       Create new alembic migration"
@@ -94,6 +95,17 @@ test-integration-db:
 		-e PYTHONDONTWRITEBYTECODE=1 \
 		--entrypoint /app/.venv/bin/python \
 		questy-app -m pytest -q --strict-markers -p no:cacheprovider -m integration_db
+
+test-coverage:
+	mkdir -p htmlcov
+	docker run --rm --network container:app \
+		-v "$(CURDIR):/workspace:ro" -v "$(CURDIR)/htmlcov:/workspace/htmlcov" -w /workspace \
+		-e PYTHONPATH=/workspace/.venv/lib/python3.14/site-packages:/workspace/src \
+		-e PYTHONDONTWRITEBYTECODE=1 -e COVERAGE_FILE=/workspace/htmlcov/.coverage \
+		--entrypoint /app/.venv/bin/python \
+		questy-app -m pytest -q --strict-markers -p no:cacheprovider \
+		--cov --cov-report=term-missing --cov-report=html \
+		--cov-report=xml:htmlcov/coverage.xml --cov-report=json:htmlcov/coverage.json
 
 create_migration:
 	@if [ -z "$(ARGS)" ]; then \

@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    name: Pre-commit checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: "3.14.7"
+          enable-cache: true
+      - name: Install dependencies
+        run: uv sync --locked --dev
+      - name: Check all files
+        run: uv run --no-sync pre-commit run --all-files --show-diff-on-failure
+
+  tests:
+    name: Tests and coverage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-admin-password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: "3.14.7"
+          enable-cache: true
+      - name: Install dependencies
+        run: uv sync --locked --dev
+      - name: Prepare test settings
+        run: |
+          cp .env.test.example .env.test
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/; s/^DB_PASSWORD=.*/DB_PASSWORD=ci-test-password/' .env.test
+      - name: Create test PostgreSQL role
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          docker exec -i "$POSTGRES_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE questy_test LOGIN PASSWORD 'ci-test-password'
+            NOSUPERUSER CREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+          SQL
+      - name: Unit tests
+        run: uv run --no-sync pytest -q --strict-markers -m unit --cov --cov-report= --cov-fail-under=0
+      - name: Integration tests without a database
+        run: >-
+          uv run --no-sync pytest -q --strict-markers -m integration_no_db
+          --cov --cov-append --cov-report= --cov-fail-under=0
+      - name: Integration tests with PostgreSQL
+        run: >-
+          uv run --no-sync pytest -q --strict-markers -m integration_db
+          --cov --cov-append --cov-report= --cov-fail-under=0
+      - name: Generate coverage reports
+        run: |
+          uv run --no-sync coverage xml --fail-under=0
+          uv run --no-sync coverage html --fail-under=0
+          uv run --no-sync coverage json --fail-under=0
+      - name: Check combined line and branch coverage
+        run: uv run --no-sync coverage report
+      - name: Upload coverage reports
+        if: ${{ !cancelled() && hashFiles('coverage.xml') != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-reports
+          path: |
+            htmlcov/
+            coverage.xml
+            coverage.json
+          retention-days: 14
+          if-no-files-found: error

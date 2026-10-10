@@ -76,3 +76,13 @@ markers = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S105", "S106"]
+
+[tool.coverage.run]
+source = ["src"]
+relative_files = true
+branch = true
+
+[tool.coverage.report]
+fail_under = 56.38
+precision = 2
+show_missing = true
