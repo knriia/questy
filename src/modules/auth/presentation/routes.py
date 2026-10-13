@@ -38,7 +38,10 @@ async def user_register(user_request: UserRegisterRequest, service: FromDishka[A
 @auth_router.post("/login", status_code=status.HTTP_200_OK)
 @inject
 async def user_login(
-    request: Request, response: Response, user_auth_request: UserAuthCredentialRequest, service: FromDishka[AuthService]
+    request: Request,
+    response: Response,
+    user_auth_request: UserAuthCredentialRequest,
+    service: FromDishka[AuthService],
 ) -> AuthSessionResponse:
     ip_address = request.client.host if request.client else "unknown"
     user_agent = request.headers.get("user-agent", "unknown")
@@ -52,6 +55,7 @@ async def user_login(
         client_name=client_name,
     )
     auth_session = await service.auth_user(user_data=user_auth_command)
+    max_age = int((auth_session.refresh_token_expires_at - datetime.now(UTC)).total_seconds())
     response.set_cookie(
         key="refresh_token",
         value=auth_session.refresh_token,
@@ -59,7 +63,7 @@ async def user_login(
         secure=True,
         samesite="lax",
         path="/auth",
-        max_age=int((auth_session.refresh_token_expires_at - datetime.now(UTC)).total_seconds()),
+        max_age=max_age,
     )
     response.set_cookie(
         key="device_id",
@@ -68,6 +72,7 @@ async def user_login(
         secure=True,
         samesite="lax",
         path="/auth",
+        max_age=max_age,
     )
     response.set_cookie(
         key="csrf_token",
@@ -76,6 +81,7 @@ async def user_login(
         secure=True,
         samesite="lax",
         path="/",
+        max_age=max_age,
     )
 
     return AuthSessionResponse(

@@ -3,6 +3,7 @@ import hmac
 import logging
 import secrets
 from datetime import UTC, datetime, timedelta
+from unicodedata import normalize
 from uuid import UUID, uuid7
 
 import jwt
@@ -19,7 +20,6 @@ from modules.auth.domain.value_objects import Password
 from modules.auth.infrastructure.password_hasher import Argon2PasswordHasher
 from modules.user.application.dto import UserCommand, UserResult
 from modules.user.application.service import UserService
-from modules.user.domain.entities import UserEntity
 from shared.config import Settings
 from shared.iuow import IUoW
 
@@ -63,23 +63,26 @@ class AuthService:
         return created_user
 
     async def auth_user(self, user_data: UserAuthCredentialCommand) -> UserAuthSessionResult:
-        if user_data.identifier_is_email:
-            user_entity = await self._user_service.get_user_by_email(email=user_data.identifier)
-        else:
-            user_entity = await self._user_service.get_user_by_username(username=user_data.identifier)
-
-        if user_entity is None:
+        password = self._validate_password_on_login(user_data.password)
+        user_id = await self._user_service.get_user_id_by_identifier(identifier=user_data.identifier)
+        if user_id is None:
+            await self._password_hash.verify(
+                password=password,
+                password_hash=self._settings.AUTH_DUMMY_PASSWORD_HASH,
+            )
             raise CredentialsValidationError("Invalid credentials.")
 
-        if not user_entity.is_active:
-            raise CredentialsValidationError("Invalid credentials.")
-
-        auth_credential = await self.get_user_credential(user_id=user_entity.id)
+        auth_credential = await self.get_user_credential(user_id=user_id)
         if not auth_credential:
+            await self._password_hash.verify(
+                password=password,
+                password_hash=self._settings.AUTH_DUMMY_PASSWORD_HASH,
+            )
             raise CredentialsValidationError("Invalid credentials.")
 
         verified = await self._password_hash.verify(
-            password=user_data.password, password_hash=auth_credential.password_hash
+            password=password,
+            password_hash=auth_credential.password_hash,
         )
         if not verified:
             raise CredentialsValidationError("Invalid credentials.")
@@ -90,7 +93,7 @@ class AuthService:
         device_id_hash = hmac.new(key=device_key, msg=device_id.encode("utf-8"), digestmod=hashlib.sha256).hexdigest()
         expires_at = now + timedelta(seconds=self._settings.AUTH_SESSION_TTL_SECONDS)
         session_entity = AuthSessionEntity.create(
-            user_id=user_entity.id,
+            user_id=user_id,
             device_id_hash=device_id_hash,
             user_agent=user_data.user_agent,
             client_name=user_data.client_name,
@@ -113,7 +116,7 @@ class AuthService:
 
         access_expire_at = now + timedelta(seconds=self._settings.ACCESS_TOKEN_TTL_SECONDS)
         access_payload = {
-            "sub": str(user_entity.id),
+            "sub": str(user_id),
             "sid": str(session_entity.id),
             "jti": str(uuid7()),
             "iat": int(now.timestamp()),
@@ -148,5 +151,11 @@ class AuthService:
     async def get_user_credential(self, user_id: UUID) -> AuthCredentialEntity | None:
         return await self._auth_credential_repo.get_auth_credential_by_user_id(user_id=user_id)
 
-    async def get_authenticated_user(self, principal: dict) -> UserEntity | None:
-        pass
+    @staticmethod
+    def _validate_password_on_login(password: str) -> str:
+        normalized = normalize("NFC", password)
+
+        if len(normalized) > 100:
+            raise CredentialsValidationError("Invalid credentials.")
+
+        return normalized

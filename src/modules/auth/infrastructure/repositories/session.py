@@ -12,3 +12,4 @@ class AuthSessionRepository(IAuthSessionRepository):
     async def create_auth_session(self, auth_session: AuthSessionEntity) -> None:
         auth_session_model = auth_session_entity_to_model(auth_session_entity=auth_session)
         self._session.add(auth_session_model)
+        await self._session.flush()

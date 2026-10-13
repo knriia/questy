@@ -12,3 +12,4 @@ class RefreshTokenRepository(IRefreshTokenRepository):
     async def create_refresh_token(self, refresh_token: AuthRefreshTokenEntity) -> None:
         refresh_token_model = refresh_token_entity_to_model(refresh_token)
         self._session.add(refresh_token_model)
+        await self._session.flush()

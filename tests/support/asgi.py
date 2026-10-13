@@ -5,7 +5,32 @@ from fastapi import FastAPI
 from starlette.types import Message, Scope
 
 
-async def post_json(app: FastAPI, path: str, payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+async def post_json(
+    app: FastAPI,
+    path: str,
+    payload: dict[str, Any],
+    *,
+    request_headers: list[tuple[bytes, bytes]] | None = None,
+    client: tuple[str, int] | None = ("127.0.0.1", 12345),
+) -> tuple[int, dict[str, Any]]:
+    status, body, _ = await post_json_with_headers(
+        app,
+        path,
+        payload,
+        request_headers=request_headers,
+        client=client,
+    )
+    return status, body
+
+
+async def post_json_with_headers(
+    app: FastAPI,
+    path: str,
+    payload: dict[str, Any],
+    *,
+    request_headers: list[tuple[bytes, bytes]] | None = None,
+    client: tuple[str, int] | None = ("127.0.0.1", 12345),
+) -> tuple[int, dict[str, Any], list[tuple[bytes, bytes]]]:
     body = json.dumps(payload).encode()
     scope: Scope = {
         "type": "http",
@@ -17,8 +42,8 @@ async def post_json(app: FastAPI, path: str, payload: dict[str, Any]) -> tuple[i
         "raw_path": path.encode(),
         "query_string": b"",
         "root_path": "",
-        "headers": [(b"content-type", b"application/json")],
-        "client": ("127.0.0.1", 12345),
+        "headers": [(b"content-type", b"application/json"), *(request_headers or [])],
+        "client": client,
         "server": ("testserver", 80),
     }
     messages: list[Message] = []
@@ -35,6 +60,7 @@ async def post_json(app: FastAPI, path: str, payload: dict[str, Any]) -> tuple[i
         messages.append(message)
 
     await app(scope, receive, send)
-    status = next(message["status"] for message in messages if message["type"] == "http.response.start")
+    response_start = next(message for message in messages if message["type"] == "http.response.start")
+    status = response_start["status"]
     content = b"".join(message.get("body", b"") for message in messages if message["type"] == "http.response.body")
-    return status, json.loads(content)
+    return status, json.loads(content), response_start.get("headers", [])
