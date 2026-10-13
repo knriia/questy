@@ -31,14 +31,6 @@ class UserAuthCredentialCommand:
     user_agent: str
     client_name: str
 
-    def __post_init__(self):
-        identifier = self.identifier.lower().strip()
-        object.__setattr__(self, "identifier", identifier)
-
-    @property
-    def identifier_is_email(self) -> bool:
-        return "@" in self.identifier
-
 
 @dataclass(kw_only=True, slots=True, frozen=True)
 class UserAuthSessionResult:

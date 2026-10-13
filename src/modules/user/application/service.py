@@ -1,8 +1,10 @@
 import logging
+from uuid import UUID
 
 from modules.user.application.dto import UserCommand, UserResult
 from modules.user.application.interface import IUserRepository
 from modules.user.domain.entities import UserEntity
+from modules.user.domain.exceptions import UserValidationError
 from modules.user.domain.value_objects import Email, Timezone, Username
 from shared.iuow import IUoW
 
@@ -36,7 +38,23 @@ class UserService:
         )
 
     async def get_user_by_username(self, username: str) -> UserEntity | None:
-        return await self._user_repo.get_user_by_username(username=username)
+        return await self._user_repo.get_user_by_username(username=Username(username).value)
 
     async def get_user_by_email(self, email: str) -> UserEntity | None:
-        return await self._user_repo.get_user_by_email(email=email)
+        return await self._user_repo.get_user_by_email(email=Email(email).value)
+
+    async def get_user_id_by_identifier(self, identifier: str) -> UUID | None:
+        if "@" in identifier:
+            try:
+                email = Email(identifier).value
+            except UserValidationError:
+                return None
+            user_entity = await self.get_user_by_email(email=email)
+        else:
+            try:
+                username = Username(identifier).value
+            except UserValidationError:
+                return None
+            user_entity = await self.get_user_by_username(username=username)
+
+        return user_entity.id if user_entity is not None and user_entity.is_active else None

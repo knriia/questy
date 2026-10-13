@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     CSRF_HMAC_KEY: str
     JWT_ISSUER: str
     JWT_AUDIENCE: str
+    AUTH_DUMMY_PASSWORD_HASH: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
