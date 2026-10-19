@@ -9,8 +9,13 @@ from modules.auth.infrastructure.password_hasher import Argon2PasswordHasher
 pytestmark = pytest.mark.unit
 
 
+async def inline_to_thread(function: Callable[..., object], *args: object) -> object:
+    return function(*args)
+
+
 @pytest.mark.asyncio
-async def test_argon2_hash_is_salted_and_verifies_only_original_password() -> None:
+async def test_argon2_hash_is_salted_and_verifies_only_original_password(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(password_hasher_module.asyncio, "to_thread", inline_to_thread)
     hasher = Argon2PasswordHasher()
     password = "valid password phrase"
     first = await hasher.hash(password)
@@ -23,7 +28,8 @@ async def test_argon2_hash_is_salted_and_verifies_only_original_password() -> No
 
 
 @pytest.mark.asyncio
-async def test_argon2_verifies_password_without_stripping_spaces() -> None:
+async def test_argon2_verifies_password_without_stripping_spaces(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(password_hasher_module.asyncio, "to_thread", inline_to_thread)
     hasher = Argon2PasswordHasher()
     password = "  valid password  "
     password_hash = await hasher.hash(password)
@@ -43,9 +49,6 @@ async def test_password_hasher_delegates_work_and_converts_verification_errors(
             if password_hash == "malformed":
                 raise VerificationError("invalid password hash")
             return password_hash == f"encoded:{password}"
-
-    async def inline_to_thread(function: Callable[..., object], *args: object) -> object:
-        return function(*args)
 
     stub_hasher = StubHasher()
     monkeypatch.setattr(password_hasher_module, "PasswordHasher", lambda: stub_hasher)

@@ -81,8 +81,12 @@ markers = [
 source = ["src"]
 relative_files = true
 branch = true
+omit = [
+    "src/modules/auth/application/interface/*.py",
+    "src/modules/user/application/interface.py",
+]
 
 [tool.coverage.report]
-fail_under = 68
+fail_under = 70
 precision = 2
 show_missing = true
