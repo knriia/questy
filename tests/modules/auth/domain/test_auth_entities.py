@@ -3,6 +3,7 @@ from uuid import uuid7
 
 import pytest
 
+from modules.auth.domain.entities.credential import AuthCredentialEntity
 from modules.auth.domain.entities.refresh_token import AuthRefreshTokenEntity
 from modules.auth.domain.entities.session import AuthSessionEntity
 from modules.auth.domain.exceptions import InvalidSessionExpirationError, InvalidTokenExpirationError
@@ -27,6 +28,17 @@ def make_refresh_token(expires_at: datetime) -> AuthRefreshTokenEntity:
         secret_hash="secret-hash",
         expires_at=expires_at,
     )
+
+
+def test_credential_password_change_updates_hash_and_timestamp() -> None:
+    credential = AuthCredentialEntity.create(user_id=uuid7(), password_hash="old-hash")
+    previous_changed_at = datetime(2000, 1, 1, tzinfo=UTC)
+    credential.password_changed_at = previous_changed_at
+
+    credential.change_password("new-hash")
+
+    assert credential.password_hash == "new-hash"
+    assert credential.password_changed_at > previous_changed_at
 
 
 def test_session_expiration_and_revocation_states() -> None:
