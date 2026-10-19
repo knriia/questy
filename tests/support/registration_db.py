@@ -25,7 +25,7 @@ def service(
         user_service=UserService(UserRepository(session), uow),
         auth_credential_repo=credential_repo if credential_repo is not None else AuthCredentialRepository(session),
         auth_session_repo=ForbiddenSessionRepository(),
-        refresh_token_repo=ForbiddenRefreshTokenRepository(),
+        auth_refresh_token_repo=ForbiddenRefreshTokenRepository(),
         uow=uow,
         password_hash=hasher if hasher is not None else RecordingPasswordHasher(),
         settings=Settings.model_construct(),

@@ -121,7 +121,7 @@ def create_auth_login_context() -> AuthLoginContext:
         user_service=UserService(user_repo=users, uow=uow),
         auth_credential_repo=credentials,
         auth_session_repo=sessions,
-        refresh_token_repo=refresh_tokens,
+        auth_refresh_token_repo=refresh_tokens,
         uow=uow,
         password_hash=hasher,
         settings=settings,

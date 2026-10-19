@@ -1,5 +1,5 @@
 from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 from uuid import uuid7
 
 import pytest
@@ -7,9 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from modules.auth.domain.entities.refresh_token import AuthRefreshTokenEntity
 from modules.auth.domain.entities.session import AuthSessionEntity
+from modules.auth.infrastructure.mappers.refresh_token import refresh_token_entity_to_model
 from modules.auth.infrastructure.mappers.session import auth_session_entity_to_model
 from modules.auth.infrastructure.models.session import AuthSessionModel
-from modules.auth.infrastructure.repositories.refresh_token import RefreshTokenRepository
+from modules.auth.infrastructure.repositories.refresh_token import AuthRefreshTokenRepository
 from modules.auth.infrastructure.repositories.session import AuthSessionRepository
 
 pytestmark = pytest.mark.unit
@@ -54,6 +55,28 @@ async def test_auth_session_repository_gets_session_by_id(found: bool) -> None:
 
 
 @pytest.mark.asyncio
+async def test_auth_session_repository_updates_revocation_time() -> None:
+    session = AsyncMock(spec=AsyncSession)
+    auth_session = AuthSessionEntity.create(
+        user_id=uuid7(),
+        device_id_hash="device-hash",
+        user_agent="test-agent",
+        client_name="web",
+        ip_created="192.0.2.1",
+        expires_at=datetime.now(UTC) + timedelta(hours=1),
+    )
+    auth_session.revoke(datetime.now(UTC))
+
+    await AuthSessionRepository(session).update_auth_session(auth_session)
+
+    statement = session.execute.await_args.args[0]
+    assert str(statement) == "UPDATE auth_sessions SET revoked_at=:revoked_at WHERE auth_sessions.id = :id_1"
+    assert auth_session.id in statement.compile().params.values()
+    assert auth_session.revoked_at in statement.compile().params.values()
+    session.flush.assert_awaited_once_with()
+
+
+@pytest.mark.asyncio
 async def test_refresh_token_repository_flushes_new_token() -> None:
     session = AsyncMock(spec=AsyncSession)
     refresh_token = AuthRefreshTokenEntity.create(
@@ -62,7 +85,55 @@ async def test_refresh_token_repository_flushes_new_token() -> None:
         expires_at=datetime.now(UTC) + timedelta(hours=1),
     )
 
-    await RefreshTokenRepository(session).create_refresh_token(refresh_token)
+    await AuthRefreshTokenRepository(session).create_refresh_token(refresh_token)
 
     session.add.assert_called_once()
+    session.flush.assert_awaited_once_with()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("token_count", [0, 2])
+async def test_refresh_token_repository_gets_tokens_by_session_id(token_count: int) -> None:
+    session = AsyncMock(spec=AsyncSession)
+    session_id = uuid7()
+    tokens = [
+        AuthRefreshTokenEntity.create(
+            session_id=session_id,
+            secret_hash=f"secret-hash-{index}",
+            expires_at=datetime.now(UTC) + timedelta(hours=1),
+        )
+        for index in range(token_count)
+    ]
+    models = [refresh_token_entity_to_model(token) for token in tokens]
+    result = Mock()
+    result.scalars.return_value.all.return_value = models
+    session.execute.return_value = result
+
+    result_tokens = await AuthRefreshTokenRepository(session).get_auth_refresh_token_by_session_id(session_id)
+
+    assert result_tokens == tokens
+    statement = session.execute.await_args.args[0]
+    assert "auth_refresh_tokens.session_id =" in str(statement)
+    assert "auth_refresh_tokens.revoked_at IS NULL" in str(statement)
+    assert session_id in statement.compile().params.values()
+
+
+@pytest.mark.asyncio
+async def test_refresh_token_repository_updates_revocation_time() -> None:
+    session = AsyncMock(spec=AsyncSession)
+    refresh_token = AuthRefreshTokenEntity.create(
+        session_id=uuid7(),
+        secret_hash="secret-hash",
+        expires_at=datetime.now(UTC) + timedelta(hours=1),
+    )
+    refresh_token.revoke(datetime.now(UTC))
+
+    await AuthRefreshTokenRepository(session).update_auth_refresh_token(refresh_token)
+
+    statement = session.execute.await_args.args[0]
+    assert str(statement) == (
+        "UPDATE auth_refresh_tokens SET revoked_at=:revoked_at WHERE auth_refresh_tokens.id = :id_1"
+    )
+    assert refresh_token.id in statement.compile().params.values()
+    assert refresh_token.revoked_at in statement.compile().params.values()
     session.flush.assert_awaited_once_with()

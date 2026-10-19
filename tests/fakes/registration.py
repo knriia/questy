@@ -91,7 +91,7 @@ def create_registration_context(users: InMemoryUserRepository | None = None) -> 
         user_service=UserService(user_repo=users, uow=uow),
         auth_credential_repo=credentials,
         auth_session_repo=ForbiddenSessionRepository(),
-        refresh_token_repo=ForbiddenRefreshTokenRepository(),
+        auth_refresh_token_repo=ForbiddenRefreshTokenRepository(),
         uow=uow,
         password_hash=hasher,
         settings=Settings.model_construct(),

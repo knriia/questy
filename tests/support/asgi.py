@@ -63,7 +63,7 @@ async def post_json_with_headers(
     response_start = next(message for message in messages if message["type"] == "http.response.start")
     status = response_start["status"]
     content = b"".join(message.get("body", b"") for message in messages if message["type"] == "http.response.body")
-    return status, json.loads(content), response_start.get("headers", [])
+    return status, json.loads(content) if content else {}, response_start.get("headers", [])
 
 
 async def get_json_with_headers(

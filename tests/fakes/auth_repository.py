@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from modules.auth.application.interface.credential import IAuthCredentialRepository
-from modules.auth.application.interface.refresh_token import IRefreshTokenRepository
+from modules.auth.application.interface.refresh_token import IAuthRefreshTokenRepository
 from modules.auth.application.interface.session import IAuthSessionRepository
 from modules.auth.domain.entities.credential import AuthCredentialEntity
 from modules.auth.domain.entities.refresh_token import AuthRefreshTokenEntity
@@ -31,10 +31,19 @@ class ForbiddenSessionRepository(IAuthSessionRepository):
     async def get_auth_session_by_id(self, session_id: UUID) -> AuthSessionEntity | None:
         raise AssertionError("Registration must not retrieve a session")
 
+    async def update_auth_session(self, auth_session: AuthSessionEntity) -> None:
+        raise AssertionError("Registration must not update a session")
 
-class ForbiddenRefreshTokenRepository(IRefreshTokenRepository):
+
+class ForbiddenRefreshTokenRepository(IAuthRefreshTokenRepository):
     async def create_refresh_token(self, refresh_token: AuthRefreshTokenEntity) -> None:
         raise AssertionError("Registration must not create a refresh token")
+
+    async def get_auth_refresh_token_by_session_id(self, session_id: UUID) -> list[AuthRefreshTokenEntity]:
+        raise AssertionError("Registration must not retrieve refresh tokens")
+
+    async def update_auth_refresh_token(self, refresh_token: AuthRefreshTokenEntity) -> None:
+        raise AssertionError("Registration must not update a refresh token")
 
 
 class InMemorySessionRepository(IAuthSessionRepository):
@@ -50,13 +59,30 @@ class InMemorySessionRepository(IAuthSessionRepository):
     async def get_auth_session_by_id(self, session_id: UUID) -> AuthSessionEntity | None:
         return self.sessions.get(session_id)
 
+    async def update_auth_session(self, auth_session: AuthSessionEntity) -> None:
+        if self.error is not None:
+            raise self.error
+        self.sessions[auth_session.id] = auth_session
 
-class InMemoryRefreshTokenRepository(IRefreshTokenRepository):
+
+class InMemoryRefreshTokenRepository(IAuthRefreshTokenRepository):
     def __init__(self) -> None:
         self.refresh_tokens: dict[UUID, AuthRefreshTokenEntity] = {}
         self.error: BaseException | None = None
 
     async def create_refresh_token(self, refresh_token: AuthRefreshTokenEntity) -> None:
+        if self.error is not None:
+            raise self.error
+        self.refresh_tokens[refresh_token.id] = refresh_token
+
+    async def get_auth_refresh_token_by_session_id(self, session_id: UUID) -> list[AuthRefreshTokenEntity]:
+        return [
+            token
+            for token in self.refresh_tokens.values()
+            if token.session_id == session_id and token.revoked_at is None
+        ]
+
+    async def update_auth_refresh_token(self, refresh_token: AuthRefreshTokenEntity) -> None:
         if self.error is not None:
             raise self.error
         self.refresh_tokens[refresh_token.id] = refresh_token
