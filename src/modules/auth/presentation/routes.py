@@ -1,7 +1,8 @@
 from datetime import UTC, datetime
+from typing import Annotated
 
 from dishka.integrations.fastapi import FromDishka, inject
-from fastapi import APIRouter, Request, Response, status
+from fastapi import APIRouter, Request, Response, Security, status
 
 from modules.auth.application.dto import UserAuthCredentialCommand, UserRegisterCommand
 from modules.auth.application.service import AuthService
@@ -11,6 +12,8 @@ from modules.auth.presentation.dto import (
     UserRegisterRequest,
     UserRegisterResponse,
 )
+from modules.auth.security.dependencies import get_current_principal
+from modules.auth.security.dto import Principal
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -89,3 +92,16 @@ async def user_login(
         access_token_expires_at=auth_session.access_token_expires_at,
         csrf_token=auth_session.csrf_token,
     )
+
+
+@auth_router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+@inject
+async def user_logout(
+    response: Response,
+    auth_service: FromDishka[AuthService],
+    current_principal: Annotated[Principal, Security(get_current_principal)],
+) -> None:
+    await auth_service.user_logout(current_principal.session_id)
+    response.delete_cookie(key="refresh_token", path="/auth")
+    response.delete_cookie(key="device_id", path="/auth")
+    response.delete_cookie(key="csrf_token")

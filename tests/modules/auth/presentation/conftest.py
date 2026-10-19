@@ -9,6 +9,7 @@ from modules.auth.application.service import AuthService
 from modules.auth.presentation.exception_handlers import setup_auth_exception_handlers
 from modules.auth.presentation.routes import auth_router
 from modules.user.presentation.exception_handlers import setup_user_exception_handlers
+from shared.config import Settings
 from tests.fakes.auth_login import AuthLoginContext
 from tests.fakes.registration import RegistrationContext
 
@@ -31,6 +32,10 @@ class AuthLoginProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def auth_service(self) -> AuthService:
         return self.auth_login.service
+
+    @provide(scope=Scope.APP)
+    def settings(self) -> Settings:
+        return self.auth_login.settings
 
 
 @pytest_asyncio.fixture

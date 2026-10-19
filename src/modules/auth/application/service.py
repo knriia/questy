@@ -10,12 +10,12 @@ import jwt
 
 from modules.auth.application.dto import UserAuthCredentialCommand, UserAuthSessionResult, UserRegisterCommand
 from modules.auth.application.interface.credential import IAuthCredentialRepository
-from modules.auth.application.interface.refresh_token import IRefreshTokenRepository
+from modules.auth.application.interface.refresh_token import IAuthRefreshTokenRepository
 from modules.auth.application.interface.session import IAuthSessionRepository
 from modules.auth.domain.entities.credential import AuthCredentialEntity
 from modules.auth.domain.entities.refresh_token import AuthRefreshTokenEntity
 from modules.auth.domain.entities.session import AuthSessionEntity
-from modules.auth.domain.exceptions import CredentialsValidationError
+from modules.auth.domain.exceptions import CredentialsValidationError, UnauthenticatedError
 from modules.auth.domain.value_objects import Password
 from modules.auth.infrastructure.password_hasher import Argon2PasswordHasher
 from modules.user.application.dto import UserCommand, UserResult
@@ -32,7 +32,7 @@ class AuthService:
         user_service: UserService,
         auth_credential_repo: IAuthCredentialRepository,
         auth_session_repo: IAuthSessionRepository,
-        refresh_token_repo: IRefreshTokenRepository,
+        auth_refresh_token_repo: IAuthRefreshTokenRepository,
         uow: IUoW,
         password_hash: Argon2PasswordHasher,
         settings: Settings,
@@ -40,7 +40,7 @@ class AuthService:
         self._user_service = user_service
         self._auth_credential_repo = auth_credential_repo
         self._auth_session_repo = auth_session_repo
-        self._refresh_token_repo = refresh_token_repo
+        self._auth_refresh_token_repo = auth_refresh_token_repo
         self._uow = uow
         self._password_hash = password_hash
         self._settings = settings
@@ -135,7 +135,7 @@ class AuthService:
 
         async with self._uow:
             await self._auth_session_repo.create_auth_session(auth_session=session_entity)
-            await self._refresh_token_repo.create_refresh_token(refresh_token=refresh_token)
+            await self._auth_refresh_token_repo.create_refresh_token(refresh_token=refresh_token)
             await self._uow.commit()
 
         return UserAuthSessionResult(
@@ -162,3 +162,21 @@ class AuthService:
 
     async def get_auth_session_by_id(self, session_id: UUID) -> AuthSessionEntity | None:
         return await self._auth_session_repo.get_auth_session_by_id(session_id=session_id)
+
+    async def user_logout(self, session_id: UUID) -> None:
+        session_entity = await self._auth_session_repo.get_auth_session_by_id(session_id=session_id)
+        if session_entity is None:
+            raise UnauthenticatedError
+
+        token_entities = await self._auth_refresh_token_repo.get_auth_refresh_token_by_session_id(session_id=session_id)
+        now = datetime.now(UTC)
+        session_entity.revoke(now)
+        for token_entity in token_entities:
+            token_entity.revoke(now)
+
+        async with self._uow:
+            await self._auth_session_repo.update_auth_session(auth_session=session_entity)
+            for token_entity in token_entities:
+                await self._auth_refresh_token_repo.update_auth_refresh_token(token_entity)
+
+            await self._uow.commit()

@@ -12,3 +12,7 @@ class IAuthSessionRepository(ABC):
     @abstractmethod
     async def get_auth_session_by_id(self, session_id: UUID) -> AuthSessionEntity | None:
         pass
+
+    @abstractmethod
+    async def update_auth_session(self, auth_session: AuthSessionEntity) -> None:
+        pass
