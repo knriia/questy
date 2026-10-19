@@ -19,3 +19,10 @@ class InvalidSessionExpirationError(AuthError):
 
 class InvalidTokenExpirationError(AuthError):
     pass
+
+
+class UnauthenticatedError(AuthError):
+    code = "user_not_authenticated"
+
+    def __init__(self, message: str = "Not authenticated") -> None:
+        super().__init__(message)

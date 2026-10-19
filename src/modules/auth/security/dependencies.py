@@ -1,10 +1,16 @@
+from datetime import UTC, datetime
+from typing import Annotated
+from uuid import UUID
+
 import jwt
 from dishka.integrations.fastapi import FromDishka, inject
-from fastapi import HTTPException, Security, status
+from fastapi import Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from modules.auth.application.service import AuthService
+from modules.auth.domain.exceptions import UnauthenticatedError
 from modules.auth.presentation.dto import AccessTokenClaims
+from modules.auth.security.dto import Principal
 from shared.config import Settings
 
 access_scheme = HTTPBearer(bearerFormat="JWT", description="Access JWT", auto_error=False)
@@ -16,11 +22,7 @@ async def get_access_token_claims(
     credentials: HTTPAuthorizationCredentials | None = Security(access_scheme),
 ) -> AccessTokenClaims:
     if credentials is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UnauthenticatedError
 
     try:
         token_clims = jwt.decode(
@@ -40,15 +42,20 @@ async def get_access_token_claims(
             aud=token_clims.get("aud"),
         )
     except jwt.PyJWTError as error:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid access token",
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from error
+        raise UnauthenticatedError("Invalid access token") from error
 
 
-async def get_current_current_user(
+@inject
+async def get_current_principal(
     auth_service: FromDishka[AuthService],
-    principal: dict = Security(get_access_token_claims),
-) -> None:
-    pass
+    access_token_claims: Annotated[AccessTokenClaims, Security(get_access_token_claims)],
+) -> Principal:
+    session_entity = await auth_service.get_auth_session_by_id(UUID(access_token_claims.sid))
+    now = datetime.now(UTC)
+    if session_entity and session_entity.is_active(now) and session_entity.user_id == UUID(access_token_claims.sub):
+        return Principal(
+            user_id=session_entity.user_id,
+            session_id=session_entity.id,
+        )
+
+    raise UnauthenticatedError

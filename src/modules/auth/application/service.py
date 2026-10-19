@@ -159,3 +159,6 @@ class AuthService:
             raise CredentialsValidationError("Invalid credentials.")
 
         return normalized
+
+    async def get_auth_session_by_id(self, session_id: UUID) -> AuthSessionEntity | None:
+        return await self._auth_session_repo.get_auth_session_by_id(session_id=session_id)
