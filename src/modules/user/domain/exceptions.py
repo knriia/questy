@@ -37,3 +37,7 @@ class UsernameAlreadyExistsError(UserConflictError):
 
     def __init__(self) -> None:
         super().__init__("Username is already registered")
+
+
+class UserNotFoundError(UserError):
+    code = "user_not_found"

@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
-from modules.user.domain.exceptions import UserConflictError, UserValidationError
+from modules.user.domain.exceptions import UserConflictError, UserNotFoundError, UserValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +50,27 @@ async def handle_user_conflict_error(
     )
 
 
+async def handle_user_not_found_error(
+    request: Request,
+    error: UserNotFoundError,
+) -> JSONResponse:
+    logger.warning(
+        "User not found: reason=%s path=%s",
+        error.code,
+        request.url.path,
+    )
+
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content={
+            "detail": {
+                "code": error.code,
+                "message": str(error),
+            }
+        },
+    )
+
+
 def setup_user_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(
         UserValidationError,
@@ -59,4 +80,9 @@ def setup_user_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(
         UserConflictError,
         handle_user_conflict_error,
+    )
+
+    app.add_exception_handler(
+        UserNotFoundError,
+        handle_user_not_found_error,
     )

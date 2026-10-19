@@ -58,3 +58,6 @@ class UserService:
             user_entity = await self.get_user_by_username(username=username)
 
         return user_entity.id if user_entity is not None and user_entity.is_active else None
+
+    async def get_user_by_id(self, user_id: UUID) -> UserEntity | None:
+        return await self._user_repo.get_user_by_id(user_id=user_id)

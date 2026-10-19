@@ -28,6 +28,9 @@ class ForbiddenSessionRepository(IAuthSessionRepository):
     async def create_auth_session(self, auth_session: AuthSessionEntity) -> None:
         raise AssertionError("Registration must not create a session")
 
+    async def get_auth_session_by_id(self, session_id: UUID) -> AuthSessionEntity | None:
+        raise AssertionError("Registration must not retrieve a session")
+
 
 class ForbiddenRefreshTokenRepository(IRefreshTokenRepository):
     async def create_refresh_token(self, refresh_token: AuthRefreshTokenEntity) -> None:
@@ -43,6 +46,9 @@ class InMemorySessionRepository(IAuthSessionRepository):
         if self.error is not None:
             raise self.error
         self.sessions[auth_session.id] = auth_session
+
+    async def get_auth_session_by_id(self, session_id: UUID) -> AuthSessionEntity | None:
+        return self.sessions.get(session_id)
 
 
 class InMemoryRefreshTokenRepository(IRefreshTokenRepository):

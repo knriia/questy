@@ -1,6 +1,6 @@
-import uuid
 from datetime import datetime
 from typing import Annotated
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, StringConstraints
 
@@ -15,7 +15,7 @@ class UserRegisterRequest(BaseModel):
 
 
 class UserRegisterResponse(BaseModel):
-    id: uuid.UUID
+    id: UUID
     username: str
     timezone: str
     status: UserStatus

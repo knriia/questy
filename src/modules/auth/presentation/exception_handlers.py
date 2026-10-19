@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
-from modules.auth.domain.exceptions import CredentialsValidationError, InvalidPasswordError
+from modules.auth.domain.exceptions import CredentialsValidationError, InvalidPasswordError, UnauthenticatedError
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +50,28 @@ async def handle_invalid_password_error(
     )
 
 
+async def handle_not_authenticated_error(
+    request: Request,
+    error: UnauthenticatedError,
+) -> JSONResponse:
+    logger.warning(
+        "Not authenticated: reason=%s path=%s",
+        error.code,
+        request.url.path,
+    )
+
+    return JSONResponse(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        content={
+            "detail": {
+                "code": error.code,
+                "message": str(error),
+            }
+        },
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
 def setup_auth_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(
         CredentialsValidationError,
@@ -59,4 +81,9 @@ def setup_auth_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(
         InvalidPasswordError,
         handle_invalid_password_error,
+    )
+
+    app.add_exception_handler(
+        UnauthenticatedError,
+        handle_not_authenticated_error,
     )

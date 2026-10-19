@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -52,3 +54,7 @@ class UserRepository(IUserRepository):
             current = current.__cause__
 
         return None
+
+    async def get_user_by_id(self, user_id: UUID) -> UserEntity | None:
+        result = await self._session.get(UserModel, user_id)
+        return user_model_to_entity(user_model=result) if result else None

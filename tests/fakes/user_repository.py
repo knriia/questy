@@ -25,6 +25,9 @@ class InMemoryUserRepository(IUserRepository):
     async def get_user_by_username(self, username: str) -> UserEntity | None:
         return next((user for user in self.users.values() if user.username.value == username), None)
 
+    async def get_user_by_id(self, user_id: UUID) -> UserEntity | None:
+        return self.users.get(user_id)
+
 
 class FailingUserRepository(InMemoryUserRepository):
     def __init__(self, error: Exception) -> None:

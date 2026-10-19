@@ -64,3 +64,44 @@ async def post_json_with_headers(
     status = response_start["status"]
     content = b"".join(message.get("body", b"") for message in messages if message["type"] == "http.response.body")
     return status, json.loads(content), response_start.get("headers", [])
+
+
+async def get_json_with_headers(
+    app: FastAPI,
+    path: str,
+    *,
+    request_headers: list[tuple[bytes, bytes]] | None = None,
+    client: tuple[str, int] | None = ("127.0.0.1", 12345),
+) -> tuple[int, dict[str, Any], list[tuple[bytes, bytes]]]:
+    scope: Scope = {
+        "type": "http",
+        "asgi": {"version": "3.0"},
+        "http_version": "1.1",
+        "method": "GET",
+        "scheme": "http",
+        "path": path,
+        "raw_path": path.encode(),
+        "query_string": b"",
+        "root_path": "",
+        "headers": request_headers or [],
+        "client": client,
+        "server": ("testserver", 80),
+    }
+    messages: list[Message] = []
+    received = False
+
+    async def receive() -> Message:
+        nonlocal received
+        if received:
+            return {"type": "http.disconnect"}
+        received = True
+        return {"type": "http.request", "body": b"", "more_body": False}
+
+    async def send(message: Message) -> None:
+        messages.append(message)
+
+    await app(scope, receive, send)
+    response_start = next(message for message in messages if message["type"] == "http.response.start")
+    status = response_start["status"]
+    content = b"".join(message.get("body", b"") for message in messages if message["type"] == "http.response.body")
+    return status, json.loads(content), response_start.get("headers", [])
