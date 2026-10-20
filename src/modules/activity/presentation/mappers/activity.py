@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from modules.activity.domain.entities.activity import ActivityEntity, SavedActivityEntity
 from modules.activity.presentation.dto.activity import ActivityCreateDTO, ActivityReadDTO
 
@@ -16,9 +18,9 @@ def activity_entity_to_dto(activity_entity: SavedActivityEntity) -> ActivityRead
     )
 
 
-def activity_dto_to_entity(activity_dto: ActivityCreateDTO) -> ActivityEntity:
+def activity_dto_to_entity(activity_dto: ActivityCreateDTO, user_id: UUID) -> ActivityEntity:
     return ActivityEntity.create(
-        user_id=activity_dto.user_id,
+        user_id=user_id,
         title=activity_dto.title,
         description=activity_dto.description,
         activity_type=activity_dto.activity_type,

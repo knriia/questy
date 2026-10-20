@@ -84,6 +84,7 @@ branch = true
 omit = [
     "src/modules/auth/application/interface/*.py",
     "src/modules/user/application/interface.py",
+    "src/modules/activity/application/interfaces/*.py",
 ]
 
 [tool.coverage.report]

@@ -7,7 +7,6 @@ from modules.activity.enums import ActivityStatus, ActivityType
 
 
 class ActivityCreateDTO(BaseModel):
-    user_id: uuid.UUID
     title: str
     description: str | None = None
     activity_type: ActivityType

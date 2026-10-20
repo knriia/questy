@@ -1,6 +1,7 @@
 from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from modules.activity.application.interfaces.activity import IActivityRepository
 from modules.activity.application.services.activity import ActivityService
 from modules.activity.application.services.activity_schedule import ActivityScheduleService
 from modules.activity.application.services.activity_schedule_dispatcher import (
@@ -9,17 +10,17 @@ from modules.activity.application.services.activity_schedule_dispatcher import (
 )
 from modules.activity.infrastructure.repositories.activity import ActivityRepository
 from modules.activity.infrastructure.repositories.activity_schedule import ActivityScheduleRepository
-from modules.activity.presentation.tasks import send_activity_notification
+from shared.iuow import IUoW
 
 
 class ActivityProvider(Provider):
     @provide(scope=Scope.REQUEST)
-    async def activity_repository(self, session: AsyncSession) -> ActivityRepository:
+    async def activity_repository(self, session: AsyncSession) -> IActivityRepository:
         return ActivityRepository(session)
 
     @provide(scope=Scope.REQUEST)
-    async def activity_service(self, repository: ActivityRepository) -> ActivityService:
-        return ActivityService(repository=repository)
+    async def activity_service(self, repository: IActivityRepository, uow: IUoW) -> ActivityService:
+        return ActivityService(repository=repository, uow=uow)
 
 
 class ActivityScheduleProvider(Provider):
@@ -35,6 +36,8 @@ class ActivityScheduleProvider(Provider):
     async def activity_schedule_task_sender(
         self,
     ) -> ActivityNotificationTaskSender:
+        from modules.activity.presentation.tasks import send_activity_notification
+
         return ActivityNotificationTaskSender(enqueue=send_activity_notification.kiq)
 
     @provide(scope=Scope.REQUEST)
