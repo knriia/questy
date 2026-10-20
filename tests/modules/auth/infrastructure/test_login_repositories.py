@@ -9,6 +9,7 @@ from modules.auth.domain.entities.refresh_token import AuthRefreshTokenEntity
 from modules.auth.domain.entities.session import AuthSessionEntity
 from modules.auth.infrastructure.mappers.refresh_token import refresh_token_entity_to_model
 from modules.auth.infrastructure.mappers.session import auth_session_entity_to_model
+from modules.auth.infrastructure.models.refresh_token import AuthRefreshTokenModel
 from modules.auth.infrastructure.models.session import AuthSessionModel
 from modules.auth.infrastructure.repositories.refresh_token import AuthRefreshTokenRepository
 from modules.auth.infrastructure.repositories.session import AuthSessionRepository
@@ -55,7 +56,7 @@ async def test_auth_session_repository_gets_session_by_id(found: bool) -> None:
 
 
 @pytest.mark.asyncio
-async def test_auth_session_repository_updates_revocation_time() -> None:
+async def test_auth_session_repository_merges_updated_session() -> None:
     session = AsyncMock(spec=AsyncSession)
     auth_session = AuthSessionEntity.create(
         user_id=uuid7(),
@@ -69,10 +70,12 @@ async def test_auth_session_repository_updates_revocation_time() -> None:
 
     await AuthSessionRepository(session).update_auth_session(auth_session)
 
-    statement = session.execute.await_args.args[0]
-    assert str(statement) == "UPDATE auth_sessions SET revoked_at=:revoked_at WHERE auth_sessions.id = :id_1"
-    assert auth_session.id in statement.compile().params.values()
-    assert auth_session.revoked_at in statement.compile().params.values()
+    session.merge.assert_awaited_once()
+    merged_model = session.merge.await_args.args[0]
+    assert merged_model.id == auth_session.id
+    assert merged_model.revoked_at == auth_session.revoked_at
+    assert merged_model.expires_at == auth_session.expires_at
+    assert merged_model.device_id_hash == auth_session.device_id_hash
     session.flush.assert_awaited_once_with()
 
 
@@ -132,8 +135,26 @@ async def test_refresh_token_repository_updates_revocation_time() -> None:
 
     statement = session.execute.await_args.args[0]
     assert str(statement) == (
-        "UPDATE auth_refresh_tokens SET revoked_at=:revoked_at WHERE auth_refresh_tokens.id = :id_1"
+        "UPDATE auth_refresh_tokens SET revoked_at=:revoked_at "
+        "WHERE auth_refresh_tokens.id = :id_1 AND auth_refresh_tokens.revoked_at IS NULL"
     )
     assert refresh_token.id in statement.compile().params.values()
     assert refresh_token.revoked_at in statement.compile().params.values()
     session.flush.assert_awaited_once_with()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("found", [True, False])
+async def test_refresh_token_repository_gets_token_by_id(found: bool) -> None:
+    session = AsyncMock(spec=AsyncSession)
+    token = AuthRefreshTokenEntity.create(
+        session_id=uuid7(),
+        secret_hash="secret-hash",
+        expires_at=datetime.now(UTC) + timedelta(hours=1),
+    )
+    session.get.return_value = refresh_token_entity_to_model(token) if found else None
+
+    result = await AuthRefreshTokenRepository(session).get_auth_refresh_token_by_token_id(token.id)
+
+    assert result == token if found else result is None
+    session.get.assert_awaited_once_with(AuthRefreshTokenModel, token.id)

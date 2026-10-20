@@ -34,7 +34,7 @@ class UserAuthCredentialCommand:
 
 @dataclass(kw_only=True, slots=True, frozen=True)
 class UserAuthSessionResult:
-    session_id: uuid.UUID
+    sid: uuid.UUID
     access_token: str = field(repr=False)
     access_token_expires_at: datetime
     refresh_token: str = field(repr=False)
