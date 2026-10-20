@@ -43,7 +43,7 @@ async def test_login_creates_session_refresh_token_access_token_and_csrf_token(
     assert auth_login.uow.enter_count == auth_login.uow.commit_count == auth_login.uow.rollback_count == 1
     assert len(auth_login.sessions.sessions) == len(auth_login.refresh_tokens.refresh_tokens) == 1
 
-    session = auth_login.sessions.sessions[result.session_id]
+    session = auth_login.sessions.sessions[result.sid]
     assert session.user_id == user.id
     assert session.user_agent == "test-agent/1.0"
     assert session.client_name == "web-client"

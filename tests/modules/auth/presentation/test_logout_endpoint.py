@@ -38,7 +38,7 @@ async def create_authenticated_session(context: AuthLoginContext) -> tuple[UUID,
             client_name="pytest",
         )
     )
-    return result.session_id, result.access_token
+    return result.sid, result.access_token
 
 
 async def test_logout_revokes_current_session_and_clears_auth_cookies(

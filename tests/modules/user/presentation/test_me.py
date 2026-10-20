@@ -24,7 +24,7 @@ async def login_user(context: AuthLoginContext) -> tuple[UserEntity, str, UUID]:
             client_name="pytest",
         )
     )
-    return user, result.access_token, result.session_id
+    return user, result.access_token, result.sid
 
 
 def auth_header(token: str) -> list[tuple[bytes, bytes]]:

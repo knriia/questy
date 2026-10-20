@@ -1,6 +1,5 @@
 from uuid import UUID
 
-from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from modules.auth.application.interface.session import IAuthSessionRepository
@@ -18,14 +17,11 @@ class AuthSessionRepository(IAuthSessionRepository):
         self._session.add(auth_session_model)
         await self._session.flush()
 
-    async def get_auth_session_by_id(self, session_id: UUID) -> AuthSessionEntity | None:
-        result = await self._session.get(AuthSessionModel, session_id)
+    async def get_auth_session_by_id(self, sid: UUID) -> AuthSessionEntity | None:
+        result = await self._session.get(AuthSessionModel, sid)
         return auth_session_model_to_entity(auth_session_model=result) if result else None
 
     async def update_auth_session(self, auth_session: AuthSessionEntity) -> None:
-        await self._session.execute(
-            update(AuthSessionModel)
-            .where(AuthSessionModel.id == auth_session.id)
-            .values(revoked_at=auth_session.revoked_at)
-        )
+        model = auth_session_entity_to_model(auth_session_entity=auth_session)
+        await self._session.merge(model)
         await self._session.flush()
